@@ -9,6 +9,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 #set(CROSS_COMPILE "arm-linux-gnueabihf-")
 set(CROSS_COMPILE "")
 
+set(CROSS "gcc_4_8_4")
+
 #指定编译器
 set(CMAKE_C_COMPILER "${CROSS_COMPILE}gcc")
 set(CMAKE_CXX_COMPILER "${CROSS_COMPILE}g++")
@@ -16,33 +18,38 @@ set(CMAKE_CXX_COMPILER "${CROSS_COMPILE}g++")
 #项目名称
 project (ui_cpp)
 
-#指定源文件目录
-aux_source_directory(${CMAKE_SOURCE_DIR} src)
+#源文件列表存储到 SRC_LIST
+aux_source_directory(${CMAKE_SOURCE_DIR}/src SRC_LIST)
 
-#find_package(OpenCV REQUIRED)
-#message(STATUS "OpenCV library status:")
-#message(STATUS "    version: ${OpenCV_VERSION}")
-#message(STATUS "    libraries: ${OpenCV_LIBS}")
-#message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+#把列表 SRC_LIST 的源文件编译成 libsrc.a
+add_library(src STATIC ${SRC_LIST})
 
-#添加 INC LIB
-#include_directories("${CMAKE_SOURCE_DIR}/inc" ${OpenCV_INCLUDE_DIRS})
+#添加头文件路径 相当于-I
+include_directories(
+    ${CMAKE_SOURCE_DIR}/inc
+    ${CMAKE_SOURCE_DIR}/lib/iconv/iconv_for_${CROSS}/include
+    ${CMAKE_SOURCE_DIR}/lib/jpeg/jpeg_for_${CROSS}/include
+    ${CMAKE_SOURCE_DIR}/lib/freeType2/freeType2_for_${CROSS}/include
+    ${CMAKE_SOURCE_DIR}/lib/freeType2/freeType2_for_${CROSS}/include/freetype
+    ${CMAKE_SOURCE_DIR}/lib/wpa_client/wpa_client_for_${CROSS}/include
+)
 
-#不同编译器用不同的库, 主要是 iconv 库
-INC = -I$(ROOT_DIR)/inc
-LIB = -lpthread -liconv -lm -ljpeg -lfreetype -lwpa_client
+#添加库路径 相当于-L
+link_directories(
+    ${CMAKE_SOURCE_DIR}/lib/iconv/iconv_for_${CROSS}/lib
+    ${CMAKE_SOURCE_DIR}/lib/jpeg/jpeg_for_${CROSS}/lib
+    ${CMAKE_SOURCE_DIR}/lib/freeType2/freeType2_for_${CROSS}/lib
+    ${CMAKE_SOURCE_DIR}/lib/wpa_client/wpa_client_for_${CROSS}/lib
+)
 
-INC += -I$(ROOT_DIR)/lib/iconv/iconv_for_$(CROSS)/include
-LIB += -L$(ROOT_DIR)/lib/iconv/iconv_for_$(CROSS)/lib
-INC += -I$(ROOT_DIR)/lib/jpeg/jpeg_for_$(CROSS)/include
-LIB += -L$(ROOT_DIR)/lib/jpeg/jpeg_for_$(CROSS)/lib
-INC += -I$(ROOT_DIR)/lib/freeType2/freeType2_for_$(CROSS)/include
-INC += -I$(ROOT_DIR)/lib/freeType2/freeType2_for_$(CROSS)/include/freetype
-LIB += -L$(ROOT_DIR)/lib/freeType2/freeType2_for_$(CROSS)/lib
-INC += -I$(ROOT_DIR)/lib/wpa_client/wpa_client_for_$(CROSS)/include
-LIB += -L$(ROOT_DIR)/lib/wpa_client/wpa_client_for_$(CROSS)/lib
+#其它编译项
+add_definitions(-O3 -Wall)
 
-
-#app对应源文件 指定依赖库
+#app对应源文件
 add_executable(app ${CMAKE_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(app ${OpenCV_LIBS})
+
+#指定依赖库 相当于-l
+target_link_libraries(app pthread iconv m jpeg freetype wpa_client src)
+
+#指定依赖库 src文件夹生成的libsrc.a
+target_link_libraries(app src)

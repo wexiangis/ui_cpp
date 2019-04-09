@@ -1,2 +1,7 @@
 *.o
 obj/*
+CMakeFiles*
+CMakeCache*
+cmake_install*
+libsrc.a
+.vscode
