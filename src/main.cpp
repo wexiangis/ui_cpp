@@ -6,19 +6,19 @@ using namespace std;
 //
 int main(int argc, char **argv)
 {
-    ViewType<bool> vt0(true);
-    ViewType<bool> vt1(new bool[3]{true, false, false}, 3);
-    ViewType<int> vt2(10);
-    ViewType<int> vt3(new int[3]{10, 9, 8}, 3);
-    ViewType<char> vt4('6');
-    ViewType<double> vt8(10.098);
-    ViewType<float> vt10(10.098);
-    ViewType<string> vt12("abc");
-    ViewType<string> vt13(new string[5]{"cdf", "234", "jjj", "kkk", "ddd"}, 5);
+    AnyType<bool> vt0(true);
+    AnyType<bool> vt1(new bool[3]{true, false, false}, 3);
+    AnyType<int> vt2(10);
+    AnyType<int> vt3(new int[3]{10, 9, 8}, 3);
+    AnyType<char> vt4('6');
+    AnyType<double> vt8(10.098);
+    AnyType<float> vt10(10.098);
+    AnyType<string> vt12("abc");
+    AnyType<string> vt13(new string[5]{"cdf", "234", "jjj", "kkk", "ddd"}, 5);
 
     cout<<vt13.get()<<", "<<vt13.get(1)<<endl;
 
-    string *ret = vt13.getN();
+    string *ret = vt13.getAll();
     cout<<ret[0]<<", "<<ret[1]<<", "<<ret[2]<<endl;
     delete[] ret;
 

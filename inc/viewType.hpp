@@ -4,30 +4,30 @@
 #include <typeinfo>
 #include <iostream>
 
-template <typename AnyType>
+template <typename ATP>
 
-class ViewType{
+class AnyType{
 
     public:
 
         //构造函数
-        explicit ViewType(AnyType v) //一个参数的构造函数 加explicit防止隐式定义
+        explicit AnyType(ATP v) //一个参数的构造函数 加explicit防止隐式定义
         {
             ISARRAY = false;
             LENGHT = 1;
-            VALUE = new AnyType[1];
+            VALUE = new ATP[1];
             *VALUE = v;
         }
-        ViewType(AnyType *v, int count)
+        AnyType(ATP *v, int count)
         {
             ISARRAY = true;
             LENGHT = count;
-            VALUE = new AnyType[count];
+            VALUE = new ATP[count];
             for(int  i = 0; i < count; i++)
                 VALUE[i] = v[i];
         }
         //析构函数
-        ~ViewType()
+        ~AnyType()
         {
             ISARRAY = false;
             LENGHT = 0;
@@ -41,28 +41,28 @@ class ViewType{
         bool isArray(){return ISARRAY;}
         int lenght(){return LENGHT;}
         //读数据
-        AnyType get(int count = 0)
+        ATP get(int count = 0)
         {
             if(VALUE && count < LENGHT)
                 return VALUE[count];
             return 0;
         }
-        AnyType* getN(int index, int count)
+        ATP* getN(int index, int count)
         {
             if(VALUE && index + count <= LENGHT)
             {
-                AnyType *ret = new AnyType[count];
+                ATP *ret = new ATP[count];
                 for(int i = 0, j = index; i < count; i++, j++)
                     ret[i] = VALUE[j];
                 return ret;
             }
             return NULL;
         }
-        AnyType* getAll()
+        ATP* getAll()
         {
             if(VALUE)
             {
-                AnyType *ret = new AnyType[LENGHT];
+                ATP *ret = new ATP[LENGHT];
                 for(int i = 0; i < LENGHT; i++)
                     ret[i] = VALUE[i];
                 return ret;
@@ -70,25 +70,25 @@ class ViewType{
             return NULL;
         }
         //修改数据
-        void set(AnyType v, int count = 0)
+        void set(ATP v, int count = 0)
         {
             if(VALUE && count < LENGHT)
                 VALUE[count] = v;
             else if(!VALUE && count == 0)
             {
-                VALUE = new AnyType[1];
+                VALUE = new ATP[1];
                 VALUE[0] = v;
                 LENGHT = 1;
             }
         }
-        void set(AnyType *v, int count)
+        void set(ATP *v, int count)
         {
             if(VALUE)
                 delete[] VALUE;
             //
             ISARRAY = true;
             LENGHT = count;
-            VALUE = new AnyType[count];
+            VALUE = new ATP[count];
             for(int  i = 0; i < count; i++)
                 VALUE[i] = v[i];
         }
@@ -116,9 +116,9 @@ class ViewType{
             return LENGHT;
         }
         //添加数据
-        int add(AnyType v)
+        int add(ATP v)
         {
-            AnyType *temp = new AnyType[LENGHT+1];
+            ATP *temp = new ATP[LENGHT+1];
             int  i = 0;
             for(; i < LENGHT; i++)
                 temp[i] = VALUE[i];
@@ -131,9 +131,9 @@ class ViewType{
             ISARRAY = true;
             return LENGHT;
         }
-        int add(AnyType *v, int count)
+        int add(ATP *v, int count)
         {
-            AnyType *temp = new AnyType[LENGHT+count];
+            ATP *temp = new ATP[LENGHT+count];
             int  i = 0, j = 0;
             for(; i < LENGHT; i++)
                 temp[i] = VALUE[i];
@@ -148,13 +148,13 @@ class ViewType{
             return LENGHT;
         }
         //插入数据
-        int insert(AnyType v, int index = -1)//安插到index的前面
+        int insert(ATP v, int index = -1)//安插到index的前面
         {
             if(index > LENGHT - 1)
                 return LENGHT;
             else if(index < 0)
                 return add(v);
-            AnyType *temp = new AnyType[LENGHT+1];
+            ATP *temp = new ATP[LENGHT+1];
             int  i = 0, j = 0;
             for(; i < LENGHT; i++, j++)
             {
@@ -174,7 +174,7 @@ class ViewType{
     private:
     
         bool ISARRAY;
-        AnyType *VALUE;
+        ATP *VALUE;
         int LENGHT;
 };
 
