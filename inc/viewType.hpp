@@ -47,17 +47,6 @@ class ViewType{
                 return VALUE[count];
             return 0;
         }
-        AnyType* getN()
-        {
-            if(VALUE)
-            {
-                AnyType *ret = new AnyType[LENGHT];
-                for(int i = 0; i < LENGHT; i++)
-                    ret[i] = VALUE[i];
-                return ret;
-            }
-            return NULL;
-        }
         AnyType* getN(int index, int count)
         {
             if(VALUE && index + count <= LENGHT)
@@ -65,6 +54,17 @@ class ViewType{
                 AnyType *ret = new AnyType[count];
                 for(int i = 0, j = index; i < count; i++, j++)
                     ret[i] = VALUE[j];
+                return ret;
+            }
+            return NULL;
+        }
+        AnyType* getAll()
+        {
+            if(VALUE)
+            {
+                AnyType *ret = new AnyType[LENGHT];
+                for(int i = 0; i < LENGHT; i++)
+                    ret[i] = VALUE[i];
                 return ret;
             }
             return NULL;
