@@ -1,5 +1,8 @@
 
-CROSS_COMPILE := 
+# CROSS_COMPILE :=arm-linux-gnueabihf-
+# CROSS :=arm_4_9_4
+
+CROSS_COMPILE :=
 CROSS :=gcc_4_8_4
 
 #默认使用 g++

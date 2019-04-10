@@ -6,9 +6,11 @@ cmake_minimum_required (VERSION 2.8)
 set(CMAKE_SYSTEM_NAME Linux)
 
 #使用交叉编译器?
-#set(CROSS_COMPILE "arm-linux-gnueabihf-")
-set(CROSS_COMPILE "")
 
+#set(CROSS_COMPILE "arm-linux-gnueabihf-")
+#set(CROSS "arm_4_9_4")
+
+set(CROSS_COMPILE "")
 set(CROSS "gcc_4_8_4")
 
 #指定编译器

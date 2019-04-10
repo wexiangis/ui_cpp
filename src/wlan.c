@@ -151,6 +151,7 @@ typedef struct{
 
     //
     Wlan_Status status;
+    bool busy;
 }Wlan_Struct;
 
 static Wlan_Struct *wlan = NULL;
@@ -166,10 +167,19 @@ int wlan_request(struct wpa_ctrl *ctrl, char *cmd, int cmdLen, char *rsp, size_t
 {
     if(!wlan || !ctrl || !cmd || !rsp || !rspLen)
         return 0;
+    
+    //----- 禁止并行指令发收 -----
+    char timeout = 0;
+    while(wlan->busy && timeout++ < 50)
+        wlan_delay_ms(10);
+    wlan->busy = true;
+    //----- 禁止并行指令发收 -----
+
     // fprintf(stdout, ">%s\n", cmd);
     size_t retLen = rspLen;
     if(wpa_ctrl_request(ctrl, cmd, cmdLen, rsp, &retLen, (void*)&_wlan_callback) == 0)
     {
+        wlan->busy = false;
         // fprintf(stdout, "%s\n", rsp);
         if(retLen)
             return retLen;
@@ -177,6 +187,7 @@ int wlan_request(struct wpa_ctrl *ctrl, char *cmd, int cmdLen, char *rsp, size_t
             return 0;
     }
     //
+    wlan->busy = false;
     return 0;
 }
 

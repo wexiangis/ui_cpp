@@ -1,0 +1,1 @@
+make -C ./ CROSS_COMPILE=arm-linux-gnueabihf- CROSS=arm_4_9_4
