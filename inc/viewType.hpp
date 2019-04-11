@@ -11,14 +11,14 @@ class AnyType{
     public:
 
         //构造函数
-        explicit AnyType(ATP v) //一个参数的构造函数 加explicit防止隐式定义
+        AnyType(std::string name, ATP v):NAME(name)
         {
             ISARRAY = false;
             LENGHT = 1;
             VALUE = new ATP[1];
             *VALUE = v;
         }
-        AnyType(ATP *v, int count)
+        AnyType(std::string name, ATP *v, int count):NAME(name)
         {
             ISARRAY = true;
             LENGHT = count;
@@ -26,6 +26,7 @@ class AnyType{
             for(int  i = 0; i < count; i++)
                 VALUE[i] = v[i];
         }
+
         //析构函数
         ~AnyType()
         {
@@ -37,9 +38,7 @@ class AnyType{
                 VALUE = NULL;
             }
         }
-        //基本参数获取
-        bool isArray(){return ISARRAY;}
-        int lenght(){return LENGHT;}
+        
         //读数据
         ATP get(int count = 0)
         {
@@ -69,6 +68,7 @@ class AnyType{
             }
             return NULL;
         }
+
         //修改数据
         void set(ATP v, int count = 0)
         {
@@ -92,6 +92,7 @@ class AnyType{
             for(int  i = 0; i < count; i++)
                 VALUE[i] = v[i];
         }
+
         //删除数据
         int del(int count = -1)//默认删除最后一个
         {
@@ -115,6 +116,7 @@ class AnyType{
             }
             return LENGHT;
         }
+
         //添加数据
         int add(ATP v)
         {
@@ -147,6 +149,7 @@ class AnyType{
             ISARRAY = true;
             return LENGHT;
         }
+        
         //插入数据
         int insert(ATP v, int index = -1)//安插到index的前面
         {
@@ -171,8 +174,14 @@ class AnyType{
             return LENGHT;
         }
 
+        //基本参数获取
+        std::string name(){return NAME;};
+        bool isArray(){return ISARRAY;}
+        int lenght(){return LENGHT;}
+
     private:
-    
+
+        std::string NAME;
         bool ISARRAY;
         ATP *VALUE;
         int LENGHT;

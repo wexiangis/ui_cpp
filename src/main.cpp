@@ -6,15 +6,10 @@ using namespace std;
 //
 int main(int argc, char **argv)
 {
-    AnyType<bool> vt0(true);
-    AnyType<bool> vt1(new bool[3]{true, false, false}, 3);
-    AnyType<int> vt2(10);
-    AnyType<int> vt3(new int[3]{10, 9, 8}, 3);
-    AnyType<char> vt4('6');
-    AnyType<double> vt8(10.098);
-    AnyType<float> vt10(10.098);
-    AnyType<string> vt12("abc");
-    AnyType<string> vt13(new string[5]{"cdf", "234", "jjj", "kkk", "ddd"}, 5);
+
+    AnyType<string> vt13("vt13", new string[5]{"cdf", "234", "jjj", "kkk", "ddd"}, 5);
+
+    cout<<"class name: "<<vt13.name()<<endl;
 
     cout<<vt13.get()<<", "<<vt13.get(1)<<endl;
 
