@@ -1198,6 +1198,19 @@ static void usage(int argc, char *argv[])
 
 #include "touch.h"
 
+static void throwout_thread(Touch_Struct *ts, TouchCallBack callback)
+{
+    pthread_attr_t attr;
+    pthread_t th;
+    //attr init
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);   //禁用线程同步, 线程运行结束后自动释放
+    //
+    pthread_create(&th, &attr, (void *)callback, (void *)ts);
+    //attr destroy
+    pthread_attr_destroy(&attr);
+}
+
 //功能: 根据屏幕倒向, 对从硬件读取的坐标数据进行坐标转换     
 //例如: 硬件读取坐标为(0, 0), 如果屏幕是往右放倒的话, 正向观察屏幕, 其坐标就应该转换为(240, 0)
 static void touch_dirSort(Touch_Struct *ts)
@@ -1341,7 +1354,8 @@ static void touch_eventSort(Touch_Struct *ts, struct input_event *event)
                 if(ts->upCallBack)
                 {
                     touch_xyErrSort(ts);
-                    ts->upCallBack(ts, ts->privateData);
+                    // ts->upCallBack(ts);
+                    throwout_thread(ts, ts->upCallBack);
                 }
             }
             else if(event->value == 1)   // DOWN 事件
@@ -1372,7 +1386,7 @@ static void touch_eventSort(Touch_Struct *ts, struct input_event *event)
                 if(ts->downCallBack)
                 {
                     // touch_xyErrSort(ts);
-                    // ts->downCallBack(ts, ts->privateData);
+                    // ts->downCallBack(ts);
                     ts->downFlag = true;
                 }
             }
@@ -1427,7 +1441,7 @@ static void touch_eventSort(Touch_Struct *ts, struct input_event *event)
                 if(ts->downCallBack && ts->downFlag)
                 {
                     touch_xyErrSort(ts);
-                    ts->downCallBack(ts, ts->privateData);
+                    ts->downCallBack(ts);
                     ts->downFlag = false;
                 }
             }
@@ -1453,7 +1467,7 @@ static void touch_eventSort(Touch_Struct *ts, struct input_event *event)
                 if(ts->movCallBack)
                 {
                     touch_xyErrSort(ts);
-                    ts->movCallBack(ts, ts->privateData);
+                    ts->movCallBack(ts);
                 }
             }
         }
@@ -1502,7 +1516,7 @@ static void touch_eventSort(Touch_Struct *ts, struct input_event *event)
                 if(ts->downCallBack && ts->downFlag)
                 {
                     touch_xyErrSort(ts);
-                    ts->downCallBack(ts, ts->privateData);
+                    ts->downCallBack(ts);
                     ts->downFlag = false;
                 }
             }
@@ -1528,7 +1542,7 @@ static void touch_eventSort(Touch_Struct *ts, struct input_event *event)
                 if(ts->movCallBack)
                 {
                     touch_xyErrSort(ts);
-                    ts->movCallBack(ts, ts->privateData);
+                    ts->movCallBack(ts);
                 }
             }
         }/*

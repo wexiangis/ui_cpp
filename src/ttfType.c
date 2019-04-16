@@ -2,6 +2,7 @@
 #include "ttfType.h"
 
 #include <stdio.h>
+#include <unistd.h>
 
 #if(VIEW_CONFIG_PRINT_LIB == 1)
 
@@ -45,8 +46,14 @@ static TtfType_Struct *ttfType = NULL;
 
 static TtfWord_Struct* _ttf_fitWord(int type, FT_ULong unicode, int byteNum)
 {
+    static char flagSync = 0;
+    //
     TtfWord_Struct *tWord = NULL;
     TtfType_Struct *tType = NULL;
+    // 禁止异步!!
+    while(flagSync)
+        usleep(50);
+    flagSync = 1;
     //
     //匹配 type
     if(!ttfType)
@@ -114,14 +121,9 @@ static TtfWord_Struct* _ttf_fitWord(int type, FT_ULong unicode, int byteNum)
             tWord = tWord->next;
             tWord->unicode = unicode;
         }
-        //成功匹配 wrod 且是可用的
-        // else if(tWord->param.bitMap)
-        // {
-        //     // printf("fit word %d\n", unicode);
-        //     *param = tWord->param;
-        //     return retByte;
-        // }
     }
+    //
+    flagSync = 0;
     return tWord;
 }
 
@@ -464,7 +466,7 @@ void ttf_getRangeByUtf8_multiLine(unsigned char *utf8_code, int type, int xEdge,
 
 //功能: 根据utf-8编码和字体代号, 返回当前字符串最终输出时矩阵横向像素个数
 //     用于确认当前输出的矩阵会不会超出屏幕或别的限制范围
-//返回: 横向字节数, -1表示失败
+//返回: 横向宽度, -1表示失败
 int ttf_getRangeByUtf8(unsigned char *utf8_code, int type, int xEdge, int *retH)
 {
     FT_ULong unicode = 0;

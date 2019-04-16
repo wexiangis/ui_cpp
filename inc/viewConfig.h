@@ -21,9 +21,8 @@
 #define  VIEW_Y_END     (VIEW_Y_SIZE-1)
 #define  VIEW_PERW      3
 #endif
-#define  VIEW_RESOLUTION  (VIEW_X_SIZE>VIEW_Y_SIZE?VIEW_Y_SIZE:VIEW_X_SIZE) //参考尺寸
-#define  VIEW_RESOLUTION_PRINT  (VIEW_RESOLUTION/10) //字体大小
 #define  VIEW_MEM_SIZE  (VIEW_X_SIZE*VIEW_Y_SIZE*VIEW_PERW)
+#define  VIEW_RESOLUTION  (VIEW_X_SIZE>VIEW_Y_SIZE?VIEW_Y_SIZE:VIEW_X_SIZE) //参考尺寸
 
 //0/ubuntu调试  1/带触屏,充电,usb识别硬件调试  2/整机硬件调试  3/4412平台
 #define VIEW_CONFIG_MODE   0
@@ -36,6 +35,13 @@
 
 //字库类型选择 0/gbk 1/ttf
 #define VIEW_CONFIG_PRINT_LIB  1
+
+//根据当前屏幕大小 得出推荐字号
+#if(VIEW_CONFIG_PRINT_LIB)
+#define  VIEW_RESOLUTION_PRINT  (VIEW_RESOLUTION/10) //字体大小
+#else
+#define  VIEW_RESOLUTION_PRINT  24  //(VIEW_RESOLUTION/10) //字体大小
+#endif
 
 //src
 #if(VIEW_CONFIG_MODE)

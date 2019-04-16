@@ -15,7 +15,7 @@ extern "C" {
 #define TOUCH_X_MIRROR  0   //镜像X数值
 #define TOUCH_Y_MIRROR  1   //镜像Y数值
 
-typedef void (*TouchCallBack)(void *own, void *privateData);
+typedef void (*TouchCallBack)(void *touch_struct);
 
 typedef struct{
     //

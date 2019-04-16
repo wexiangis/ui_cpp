@@ -6,6 +6,8 @@
 
 template <typename ATP>
 
+//注意: 使用模板的类,被继承时需指定类型(等于失去了"任意类型")
+//例如: class A : AnyType<int>
 class AnyType{
 
     public:
