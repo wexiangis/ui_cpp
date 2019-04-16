@@ -1,5 +1,5 @@
-#ifndef _VIEWTYPE_HPP_
-#define _VIEWTYPE_HPP_
+#ifndef _VIEWTYPE_H_
+#define _VIEWTYPE_H_
 
 #include <typeinfo>
 #include <iostream>
@@ -12,7 +12,7 @@ class AnyType{
 
     public:
 
-        //构造函数
+        //----- 构造函数 -----
         AnyType(std::string name, ATP v):NAME(name)
         {
             ISARRAY = false;
@@ -29,7 +29,7 @@ class AnyType{
                 VALUE[i] = v[i];
         }
 
-        //析构函数
+        //----- 析构函数 -----
         ~AnyType()
         {
             ISARRAY = false;
@@ -41,7 +41,7 @@ class AnyType{
             }
         }
         
-        //读数据
+        //----- 读数据 -----
         ATP get(int count = 0)
         {
             if(VALUE && count < LENGHT)
@@ -71,7 +71,7 @@ class AnyType{
             return NULL;
         }
 
-        //修改数据
+        //----- 修改数据 -----
         void set(ATP v, int count = 0)
         {
             if(VALUE && count < LENGHT)
@@ -95,7 +95,7 @@ class AnyType{
                 VALUE[i] = v[i];
         }
 
-        //删除数据
+        //----- 删除数据 -----
         int del(int count = -1)//默认删除最后一个
         {
             if(VALUE && count < LENGHT)
@@ -119,7 +119,7 @@ class AnyType{
             return LENGHT;
         }
 
-        //添加数据
+        //----- 添加数据 -----
         int add(ATP v)
         {
             ATP *temp = new ATP[LENGHT+1];
@@ -152,7 +152,7 @@ class AnyType{
             return LENGHT;
         }
         
-        //插入数据
+        //----- 插入数据 -----
         int insert(ATP v, int index = -1)//安插到index的前面
         {
             if(index > LENGHT - 1)
@@ -176,7 +176,7 @@ class AnyType{
             return LENGHT;
         }
 
-        //基本参数获取
+        //----- 基本参数获取 -----
         std::string name(){return NAME;};
         bool isArray(){return ISARRAY;}
         int lenght(){return LENGHT;}

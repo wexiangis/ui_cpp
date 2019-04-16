@@ -1,8 +1,36 @@
-#include "viewType.hpp"
 
+#include <unistd.h>
+
+#include "view.h"
 #include <iostream>
-using namespace std;
 
+#define TEST_MODE 1
+
+#if(TEST_MODE == 1)
+//
+int main(int argc, char **argv)
+{
+    ViewPen pen(0);
+
+    while(1)
+    {
+        pen.clear(0xFF0000);
+        pen.refresh();
+        sleep(1);
+
+        pen.clear(0x00FF00);
+        pen.refresh();
+        sleep(1);
+
+        pen.clear(0x0000FF);
+        pen.refresh();
+        sleep(1);
+    }
+
+    return 0;
+}
+
+#elif(TEST_MODE == 0)
 //
 int main(int argc, char **argv)
 {
@@ -26,3 +54,5 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+#endif
