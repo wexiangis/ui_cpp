@@ -66,14 +66,21 @@ void _mapRelease(unsigned char ***map, int width, int height)
     free(map);
 }
 
-ViewPicture::ViewPicture(char *picPath)
+ViewPicture::ViewPicture(const char *picPath)
 {
     if(picPath == NULL)
         return;
+    READY = 0;
     //备份图片路径
     int pathLen = strlen(picPath);
     PICPATH = (char *)calloc(pathLen+1, 1);
     strcpy(PICPATH, picPath);
+    //
+    // if(MEM)
+    // {
+    //     free(MEM);
+    //     MEM = NULL;
+    // }
     //读取图片
     if(access(picPath, F_OK) == 0)
     {
@@ -84,8 +91,6 @@ ViewPicture::ViewPicture(char *picPath)
         //
         if(!MEM)
             return;
-        //
-
         //就绪
         READY = 1;
     }
@@ -93,58 +98,64 @@ ViewPicture::ViewPicture(char *picPath)
 
 ViewPicture::~ViewPicture()
 {
-    if(Mem) free(Mem);
-    if(Map) _mapRelease(Map, Width, Height);
+    READY = 0;
     if(MEM) free(MEM);
     if(PICPATH) free(PICPATH);
-    READY = 0;
 }
 
-void ViewPicture::set_width(int w)
+void ViewPicture::refresh(const char *picPath)
 {
-    if(w == Width)
+    if(picPath == NULL)
         return;
+    READY = 0;
+    //备份图片路径
+    int pathLen = strlen(picPath);
+    PICPATH = (char *)calloc(pathLen+1, 1);
+    strcpy(PICPATH, picPath);
     //
-}
-
-void ViewPicture::set_height(int h)
-{
-    
-}
-
-void ViewPicture::set_size(int w, int h)
-{
-    
-}
-
-void ViewPicture::set_alpha_color(int distColot)
-{
-    
-}
-
-void ViewPicture::set_replace_color(int distColot, int repColor)
-{
-    
-}
-
-unsigned char* ViewPicture::get_mem(int w, int h)
-{
-    return NULL;
-}
-
-unsigned char*** ViewPicture::get_map(int w, int h)
-{
-    return NULL;
+    if(MEM)
+    {
+        free(MEM);
+        MEM = NULL;
+    }
+    //读取图片
+    if(access(picPath, F_OK) == 0)
+    {
+        if(strstr(picPath, ".bmp") || strstr(picPath, ".BMP"))
+            MEM = bmp_get(PICPATH, &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
+        else
+            MEM = dejpeg(PICPATH,  &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
+        //
+        if(!MEM)
+            return;
+        //就绪
+        READY = 1;
+    }
 }
 
 void ViewPicture::refresh()
 {
-    
-}
-
-void ViewPicture::refresh(char *picPath)
-{
-    
+    //读取图片
+    if(access(PICPATH, F_OK) == 0)
+    {
+        READY = 0;
+        //
+        if(MEM)
+        {
+            free(MEM);
+            MEM = NULL;
+        }
+        //
+        if(strstr(PICPATH, ".bmp") || strstr(PICPATH, ".BMP"))
+            MEM = bmp_get(PICPATH, &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
+        else
+            MEM = dejpeg(PICPATH,  &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
+        //
+        if(!MEM)
+            return;
+        //就绪
+        READY = 1;
+    }
 }
 
 char ViewPicture::isReady()
