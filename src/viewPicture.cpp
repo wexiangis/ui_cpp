@@ -75,12 +75,6 @@ ViewPicture::ViewPicture(const char *picPath)
     int pathLen = strlen(picPath);
     PICPATH = (char *)calloc(pathLen+1, 1);
     strcpy(PICPATH, picPath);
-    //
-    // if(MEM)
-    // {
-    //     free(MEM);
-    //     MEM = NULL;
-    // }
     //读取图片
     if(access(picPath, F_OK) == 0)
     {
@@ -158,8 +152,33 @@ void ViewPicture::refresh()
     }
 }
 
-char ViewPicture::isReady()
+ unsigned char* ViewPicture::get_mem(int w, int h,
+    int *distColot = NULL,
+    int *repColor = NULL,
+    int count = 0)
+ {
+     return NULL;
+ }
+
+ unsigned char*** ViewPicture::get_map(int w, int h,
+        int *distColot = NULL,
+        int *repColor = NULL,
+        int count = 0,
+        int *alphaColor = NULL,
+        int count2 = 0)
+ {
+     return NULL;
+ }
+
+void ViewPicture::release_map(unsigned char ***map, int w, int h)
 {
-    return READY;
+    _mapRelease(map, w, h);
 }
 
+char ViewPicture::ready(){return READY;}
+int ViewPicture::width(){return WIDTH;}
+int ViewPicture::height(){return HEIGHT;}
+int ViewPicture::wSize(){return WSIZE;}
+int ViewPicture::memSize(){return MEMSIZE;}
+char* ViewPicture::picPath(){return PICPATH;}
+unsigned char* ViewPicture::mem(){return MEM;}
