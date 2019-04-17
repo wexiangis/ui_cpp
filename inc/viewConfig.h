@@ -2,6 +2,9 @@
 #ifndef _VIEWCONFIG_H
 #define _VIEWCONFIG_H
 
+//0/ubuntu调试  1/带触屏,充电,usb识别硬件调试  2/整机硬件调试  3/4412平台
+#define VIEW_CONFIG_MODE   0
+
 //==================== 屏幕参数 ====================
 #define  VIEW_X_START    0
 #define  VIEW_Y_START    0
@@ -13,19 +16,14 @@
 #define  VIEW_Y_END     479
 #define  VIEW_PERW      4
 #else
-// #define  VIEW_X_SIZE    720
-// #define  VIEW_Y_SIZE    400
-#define  VIEW_X_SIZE    240
-#define  VIEW_Y_SIZE    240
+#define  VIEW_X_SIZE    800
+#define  VIEW_Y_SIZE    600
 #define  VIEW_X_END     (VIEW_X_SIZE-1)
 #define  VIEW_Y_END     (VIEW_Y_SIZE-1)
 #define  VIEW_PERW      3
 #endif
 #define  VIEW_MEM_SIZE  (VIEW_X_SIZE*VIEW_Y_SIZE*VIEW_PERW)
 #define  VIEW_RESOLUTION  (VIEW_X_SIZE>VIEW_Y_SIZE?VIEW_Y_SIZE:VIEW_X_SIZE) //参考尺寸
-
-//0/ubuntu调试  1/带触屏,充电,usb识别硬件调试  2/整机硬件调试  3/4412平台
-#define VIEW_CONFIG_MODE   0
 
 //保存每帧图像 VIEW_CONFIG_MODE = 0时可用
 #define VIEW_CONFIG_FRAME  0

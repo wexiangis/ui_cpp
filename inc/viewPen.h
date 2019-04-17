@@ -38,8 +38,7 @@ public:
     void print(int x, int y, int color);
     void print(int x, int y, int color, float alpha);
     //面填充
-    void print_map(int xStart, int yStart, int xEnd, int yEnd, unsigned char *rgb);
-    void print_map(int xStart, int yStart, int xEnd, int yEnd, unsigned char *rgb, float alpha);
+    void print_map(int xStart, int yStart, int xSize, int ySize, unsigned char *rgb, float alpha);
 
     //----- 其它 -----
     

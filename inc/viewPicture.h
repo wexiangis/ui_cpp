@@ -14,8 +14,8 @@ public:
     explicit ViewPicture(const char *picPath);
     ~ViewPicture();
 
-    //----- 获取原始数据指针 (用完记得free) -----
-    unsigned char* get_mem(int w, int h, //指定width,height 获得缩放后的图片数据
+    //----- 获取 rgb 数据指针 (用完记得free) -----
+    unsigned char* get_mem(int w, int h, //指定width,height 获得缩放后的rgb图片数据
         int *distColot, //指定目标颜色的数组
         int *repColor,  //指定替换颜色的数组
         int count);     //颜色个数
@@ -47,6 +47,7 @@ private:
     //原始数据
     int WIDTH, HEIGHT, WSIZE, MEMSIZE;//原始大小 WSIZE/每像素字节
     unsigned char *MEM;//原始数据
+    unsigned char ***MAP;
     char *PICPATH;
     char READY;
 

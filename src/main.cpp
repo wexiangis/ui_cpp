@@ -1,7 +1,8 @@
 
 #include <unistd.h>
 
-#include "view.h"
+#include "viewPen.h"
+#include "viewPicture.h"
 #include <iostream>
 
 #define TEST_MODE 1
@@ -11,19 +12,23 @@
 //
 int main(int argc, char **argv)
 {
+    ViewPicture pic("./res/jpeg/test.jpg");
+    if(!pic.ready())
+    {
+        std::cout<<"pic init err !"<<std::endl;
+        return -1;
+    }
+
+    int resW = pic.width(), resH = pic.height();
+    unsigned char *res = pic.get_mem(resW, resH, NULL, NULL, 0);
+
     ViewPen pen(0);
+
+    pen.clear(0xFF0000);
 
     while(1)
     {
-        pen.clear(0xFF0000);
-        pen.refresh();
-        sleep(1);
-
-        pen.clear(0x00FF00);
-        pen.refresh();
-        sleep(1);
-
-        pen.clear(0x0000FF);
+        pen.print_map(0, 0, resW, resH, res, 0);
         pen.refresh();
         sleep(1);
     }

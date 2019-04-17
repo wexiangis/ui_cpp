@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include "viewPen.h"
 
 ViewPen::ViewPen(int displayDir = 0):
@@ -49,18 +51,61 @@ void ViewPen::print(int x, int y, int color, float alpha)
     amoled_print_dot2(x, y, color, alpha);
 }
 
-void ViewPen::print_map(int xStart, int yStart, int xEnd, int yEnd, unsigned char *rgb)
+void ViewPen::print_map(int xStart, int yStart, int xSize, int ySize, unsigned char *rgb, float alpha = 0)
 {
-    if(!rgb ||
+    if(!rgb || alpha == 1 ||
         xStart > XEND || yStart > YEND ||
-        xEnd < XSTART || yEnd < YSTART)
+        xStart+xSize <= XSTART || yStart+ySize <= YSTART)
         return;
-}
+    //
+    int xS, yS, mxS, myS;
+    int xL, yL;
+    //
+    if(xStart < XSTART)
+    {
+        mxS = XSTART;
+        xS = XSTART - xStart;
+    }else
+    {
+        mxS = xStart;
+        xS = 0;
+    }
+    if(yStart < YSTART)
+    {
+        myS = YSTART;
+        yS = YSTART - yStart;
+    }else
+    {
+        myS = yStart;
+        yS = 0;
+    }
+    //
+    if(xSize - xS + mxS - 2 < XEND)
+        xL = xSize;
+    else
+        xL = XEND - mxS + 1;
+    if(ySize - yS + myS - 2 < YEND)
+        yL = ySize;
+    else
+        yL = YEND - myS + 1;
+    //
+    if(alpha == 0)
+    {
+        for(int i = 0; i < yL; i++)
+            memcpy(AS->data.backupMap[myS+i][mxS], &rgb[(yS+i)*xSize*3 + xS*3], xL*3);
+    }
+    // else
+    // {
+    //     unsigned char *line;
+    //     int xE = xS + xL, yE = yS + yL;
+    //     for(int i = 0; i < yL; i++)
+    //     {
+    //         line = &rgb[(yS+i)*xSize*3 + xS*3];
+    //         for(j = 0; j < xL; j++)
+    //         {
 
-void ViewPen::print_map(int xStart, int yStart, int xEnd, int yEnd, unsigned char *rgb, float alpha)
-{
-    if(!rgb ||
-        xStart > XEND || yStart > YEND ||
-        xEnd < XSTART || yEnd < YSTART)
-        return;
+    //         }
+    //     }
+    // }
+    
 }

@@ -85,6 +85,8 @@ ViewPicture::ViewPicture(const char *picPath)
         //
         if(!MEM)
             return;
+        //
+        MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
         //就绪
         READY = 1;
     }
@@ -93,6 +95,7 @@ ViewPicture::ViewPicture(const char *picPath)
 ViewPicture::~ViewPicture()
 {
     READY = 0;
+    if(MAP) _mapRelease(MAP, WIDTH, HEIGHT);
     if(MEM) free(MEM);
     if(PICPATH) free(PICPATH);
 }
@@ -112,6 +115,11 @@ void ViewPicture::refresh(const char *picPath)
         free(MEM);
         MEM = NULL;
     }
+    if(MAP)
+    {
+        _mapRelease(MAP, WIDTH, HEIGHT);
+        MAP = NULL;
+    }
     //读取图片
     if(access(picPath, F_OK) == 0)
     {
@@ -122,6 +130,8 @@ void ViewPicture::refresh(const char *picPath)
         //
         if(!MEM)
             return;
+        //
+        MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
         //就绪
         READY = 1;
     }
@@ -139,6 +149,11 @@ void ViewPicture::refresh()
             free(MEM);
             MEM = NULL;
         }
+        if(MAP)
+        {
+            _mapRelease(MAP, WIDTH, HEIGHT);
+            MAP = NULL;
+        }
         //
         if(strstr(PICPATH, ".bmp") || strstr(PICPATH, ".BMP"))
             MEM = bmp_get(PICPATH, &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
@@ -147,6 +162,8 @@ void ViewPicture::refresh()
         //
         if(!MEM)
             return;
+        //
+        MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
         //就绪
         READY = 1;
     }
@@ -157,7 +174,33 @@ void ViewPicture::refresh()
     int *repColor = NULL,
     int count = 0)
  {
-     return NULL;
+    if(!READY)
+        return NULL;
+    //
+    int mem_size = w*h*3;
+    unsigned char *mem = (unsigned char *)calloc(mem_size+1, 1);
+    int xC, yC, pxC, pyC, i;
+    float pxCf, pyCf, xPow, yPow;
+    //
+    xPow = (float)WIDTH/w;
+    yPow = (float)HEIGHT/h;
+    //
+    i = 0;
+    for(yC = pyCf = 0; yC < h; yC++, pyCf+=yPow)
+    {
+        pyC = pyCf;
+        for(xC = pxCf = 0; xC < w; xC++, pxCf+=xPow)
+        {
+            pxC = pxCf;
+            mem[i++] = MAP[pyC][pxC][0];
+            mem[i++] = MAP[pyC][pxC][1];
+            mem[i++] = MAP[pyC][pxC][2];
+        }
+    }
+    //颜色处理
+
+    //
+    return mem;
  }
 
  unsigned char*** ViewPicture::get_map(int w, int h,
@@ -167,7 +210,10 @@ void ViewPicture::refresh()
         int *alphaColor = NULL,
         int count2 = 0)
  {
-     return NULL;
+    if(!READY)
+        return NULL;
+    
+    return NULL;
  }
 
 void ViewPicture::release_map(unsigned char ***map, int w, int h)
