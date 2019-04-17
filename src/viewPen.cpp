@@ -9,35 +9,43 @@ ViewPen::ViewPen(int displayDir = 0):
     AS = amoled_malloc(displayDir, VIEW_X_SIZE, VIEW_Y_SIZE, VIEW_PERW);
 }
 
-ViewPen::~ViewPen(){
+ViewPen::~ViewPen()
+{
     amoled_free(AS);
 }
 
-void ViewPen::set_dir(int displayDir = 0){
+void ViewPen::set_dir(int displayDir = 0)
+{
     amoled_displayDir(displayDir);
 }
 
-void ViewPen::set_mode(ViewPen_Mode mode){
+void ViewPen::set_mode(ViewPen_Mode mode)
+{
     amoled_modeSet(mode);
 }
 
-void ViewPen::set_bright(unsigned char bright){
+void ViewPen::set_bright(unsigned char bright)
+{
     amoled_brightSet(bright);
 }
 
-void ViewPen::refresh(){
+void ViewPen::refresh()
+{
     amoled_print_en();
 }
 
-void ViewPen::clear(int color = 0){
+void ViewPen::clear(int color = 0)
+{
     amoled_print_clear(color);
 }
 
-void ViewPen::print(int x, int y, int color){
+void ViewPen::print(int x, int y, int color)
+{
     amoled_print_dot(x, y, color);
 }
 
-void ViewPen::print(int x, int y, int color, float alpha){
+void ViewPen::print(int x, int y, int color, float alpha)
+{
     amoled_print_dot2(x, y, color, alpha);
 }
 

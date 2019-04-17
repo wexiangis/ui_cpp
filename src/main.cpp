@@ -7,6 +7,7 @@
 #define TEST_MODE 1
 
 #if(TEST_MODE == 1)
+
 //
 int main(int argc, char **argv)
 {
