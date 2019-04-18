@@ -121,43 +121,6 @@ ViewPicture::~ViewPicture()
     if(PICPATH) free(PICPATH);
 }
 
-void ViewPicture::refresh(const char *picPath)
-{
-    if(picPath == NULL)
-        return;
-    READY = 0;
-    //备份图片路径
-    int pathLen = strlen(picPath);
-    PICPATH = (char *)calloc(pathLen+1, 1);
-    strcpy(PICPATH, picPath);
-    //
-    if(MEM)
-    {
-        free(MEM);
-        MEM = NULL;
-    }
-    if(MAP)
-    {
-        _mapRelease(MAP, WIDTH, HEIGHT);
-        MAP = NULL;
-    }
-    //读取图片
-    if(access(picPath, F_OK) == 0)
-    {
-        if(strstr(picPath, ".bmp") || strstr(picPath, ".BMP"))
-            MEM = bmp_get(PICPATH, &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
-        else
-            MEM = dejpeg(PICPATH,  &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
-        //
-        if(!MEM)
-            return;
-        //
-        MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
-        //就绪
-        READY = 1;
-    }
-}
-
 void ViewPicture::refresh()
 {
     //读取图片

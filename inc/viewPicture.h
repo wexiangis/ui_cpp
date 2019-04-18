@@ -37,7 +37,6 @@ public:
 
     //----- 其它 -----
     void refresh();//刷新图片数据,重新从文件读入
-    void refresh(const char *picPath);//刷新图片数据,更换图片,重新从文件读入
     
     //----- 基本参数 -----
     char ready();//返回 0/异常(比如图片无法正常加载) 1/正常
