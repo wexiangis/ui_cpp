@@ -124,6 +124,7 @@ void ViewPen::print_rgb(unsigned char *rgb, int xStart, int yStart, int xSize, i
     }
     else
     {
+        float alpha2 = 1-alpha;
         for(i = 0; i < yL; i++, myS++)
         {
             line = &rgb[cc2];
@@ -132,18 +133,18 @@ void ViewPen::print_rgb(unsigned char *rgb, int xStart, int yStart, int xSize, i
                 cc = j*3;
 #if(AMOLED_RGB_MODE == 1)
                 AS->data.backupMap[myS][mxS2][2] = 
-                    AS->data.backupMap[myS][mxS2][2]*alpha + line[cc]*(1-alpha);
+                    AS->data.backupMap[myS][mxS2][2]*alpha + line[cc]*alpha2;
                 AS->data.backupMap[myS][mxS2][1] = 
-                    AS->data.backupMap[myS][mxS2][1]*alpha + line[cc+1]*(1-alpha);
+                    AS->data.backupMap[myS][mxS2][1]*alpha + line[cc+1]*alpha2;
                 AS->data.backupMap[myS][mxS2][0] = 
-                    AS->data.backupMap[myS][mxS2][0]*alpha + line[cc+2]*(1-alpha);
+                    AS->data.backupMap[myS][mxS2][0]*alpha + line[cc+2]*alpha2;
 #else
                 AS->data.backupMap[myS][mxS2][0] = 
-                    AS->data.backupMap[myS][mxS2][0]*alpha + line[cc]*(1-alpha);
+                    AS->data.backupMap[myS][mxS2][0]*alpha + line[cc]*alpha2;
                 AS->data.backupMap[myS][mxS2][1] = 
-                    AS->data.backupMap[myS][mxS2][1]*alpha + line[cc+1]*(1-alpha);
+                    AS->data.backupMap[myS][mxS2][1]*alpha + line[cc+1]*alpha2;
                 AS->data.backupMap[myS][mxS2][2] = 
-                    AS->data.backupMap[myS][mxS2][2]*alpha + line[cc+2]*(1-alpha);
+                    AS->data.backupMap[myS][mxS2][2]*alpha + line[cc+2]*alpha2;
 #endif
             }
             cc2 += cc2p;
@@ -186,6 +187,7 @@ void ViewPen::print_map(unsigned char ***map, int xStart, int yStart, int xSize,
     }
     else
     {
+        float alpha2 = 1-alpha;
         for(yC = yS, myC = myS; yC < yCEnd; yC++, myC++)
         {
             for(xC = xS, mxC = mxS; xC < xCEnd; xC++, mxC++)
@@ -194,18 +196,18 @@ void ViewPen::print_map(unsigned char ***map, int xStart, int yStart, int xSize,
                 {
 #if(AMOLED_RGB_MODE == 1)
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + map[yC][xC][0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + map[yC][xC][0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + map[yC][xC][1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + map[yC][xC][1]*alpha2;
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + map[yC][xC][2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + map[yC][xC][2]*alpha2;
 #else
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + map[yC][xC][0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + map[yC][xC][0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + map[yC][xC][1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + map[yC][xC][1]*alpha2;
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + map[yC][xC][2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + map[yC][xC][2]*alpha2;
 #endif
                 }
             }
@@ -253,6 +255,7 @@ void ViewPen::print_grid(unsigned char *grid, int color, int xStart, int yStart,
     }
     else
     {
+        float alpha2 = 1-alpha;
         for(yC = yS, myC = myS; yC < yCEnd; yC++, myC++)
         {
             line = &grid[cc];
@@ -262,18 +265,18 @@ void ViewPen::print_grid(unsigned char *grid, int color, int xStart, int yStart,
                 {
 #if(AMOLED_RGB_MODE == 1)
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + col[0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + col[0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*alpha2;
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + col[2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + col[2]*alpha2;
 #else
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + col[0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + col[0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*alpha2;
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + col[2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + col[2]*alpha2;
 #endif
                 }
             }
@@ -353,6 +356,7 @@ void ViewPen::print_grid2(unsigned char *grid, int color, int xStart, int yStart
     }
     else
     {
+        float alpha2 = 1-alpha;
         for(yC = yS, myC = myS; yC < yCEnd; yC++, myC++)
         {
             line = &grid[cc];
@@ -364,18 +368,18 @@ void ViewPen::print_grid2(unsigned char *grid, int color, int xStart, int yStart
                 {
 #if(AMOLED_RGB_MODE == 1)
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + col[0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + col[0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*alpha2;
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + col[2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + col[2]*alpha2;
 #else
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + col[0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + col[0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + col[1]*alpha2;
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + col[2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + col[2]*alpha2;
 #endif
                 }
                 else
@@ -393,18 +397,18 @@ void ViewPen::print_grid2(unsigned char *grid, int color, int xStart, int yStart
                     }
 #if(AMOLED_RGB_MODE == 1)
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + colBak[0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + colBak[0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + colBak[1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + colBak[1]*alpha2;
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + colBak[2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + colBak[2]*alpha2;
 #else
                     AS->data.backupMap[myC][mxC][0] = 
-                        AS->data.backupMap[myC][mxC][0]*alpha + colBak[0]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][0]*alpha + colBak[0]*alpha2;
                     AS->data.backupMap[myC][mxC][1] = 
-                        AS->data.backupMap[myC][mxC][1]*alpha + colBak[1]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][1]*alpha + colBak[1]*alpha2;
                     AS->data.backupMap[myC][mxC][2] = 
-                        AS->data.backupMap[myC][mxC][2]*alpha + colBak[2]*(1-alpha);
+                        AS->data.backupMap[myC][mxC][2]*alpha + colBak[2]*alpha2;
 #endif
                 }
             }

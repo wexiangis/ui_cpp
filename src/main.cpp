@@ -6,13 +6,15 @@
 #include "viewPicture.h"
 #include <iostream>
 
-void clock_count()
+int clock_count()
 {
     static int last = 0, th = 0;
     int current = clock();
-    std::cout<<"clock "<<th<<" : "<<current-last<<std::endl;
+    int result = current-last;
+    std::cout<<"clock "<<th<<" : "<<result<<std::endl;
     last = current;
     th += 1;
+    return result;
 }
 
 unsigned char* build_grid(int w, int h)
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    int resW = 700, resH = 500;
+    int resW = 600, resH = 400;
 
     unsigned char *res = pic.get_mem(resW, resH, 
         new int[5] {0xFF0000, 0x00FF00, 0x0000FF, 0xFFFFFF, 0x000000}, 
@@ -67,19 +69,27 @@ int main(int argc, char **argv)
     // while(1)
     {
         clock_count();
+        std::cout<<"\n";
+
         pen.print_rgb(res, 0, 0, resW, resH, 0);
         clock_count();
         pen.print_map(res2, 50, 50, resW, resH, 0);
         clock_count();
-        pen.print_grid2(grid, 0xFF0000, 100, 100, resW, resH, 0);
+        pen.print_grid(grid, 0xFF0000, 100, 100, resW, resH, 0);
         clock_count();
+        pen.print_grid2(grid, 0xFF0000, 150, 150, resW, resH, 0);
+        clock_count();
+        std::cout<<"\n";
 
         pen.print_rgb(res, 0, 0+200, resW, resH, 0.5);
         clock_count();
         pen.print_map(res2, 50, 50+200, resW, resH, 0.5);
         clock_count();
-        pen.print_grid2(grid, 0x0000FF, 100, 100+200, resW, resH, 0.5);
+        pen.print_grid(grid, 0x0000FF, 100, 100+200, resW, resH, 0.5);
         clock_count();
+        pen.print_grid2(grid, 0x0000FF, 150, 150+200, resW, resH, 0.5);
+        clock_count();
+        std::cout<<"\n";
 
         pen.refresh();
         // sleep(1);
