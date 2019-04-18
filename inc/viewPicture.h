@@ -1,13 +1,11 @@
 #ifndef _VIEWPICTURE_H_
 #define _VIEWPICTURE_H_
 
-#include <iostream>
-
 //注意事项:
 //  禁止对象拷贝(内有指针内存分配)
 
-class ViewPicture{
-
+class ViewPicture
+{
 public:
 
     //----- 构造函数 -----
@@ -33,6 +31,8 @@ public:
     unsigned char*** get_map(int w, int h, //指定width,height 获得缩放后的图片数据
         int *alphaColor, //指定透明色数组(目标指针将为NULL,例如 map[Y][X]=NULL
         int count);      //透明色个数
+    unsigned char*** get_map(unsigned char *pic, int width, int height, int pw);
+    unsigned char*** get_map(unsigned char *pic, int picWidth, int picHeight, int mapWidth, int mapHeight, int pw);
     void release_map(unsigned char ***map, int w, int h);
 
     //----- 其它 -----

@@ -47,7 +47,6 @@ public:
     void print_grid2(unsigned char *grid, int color, int xStart, int yStart, int xSize, int ySize, float alpha);
 
     //----- 其它 -----
-    
 
 private:
 

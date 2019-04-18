@@ -58,13 +58,10 @@ int main(int argc, char **argv)
         new int[5] {0xFF0000, 0x00FF00, 0x0000FF, 0xFFFFFF, 0x000000}, 
         new int[5] {0xFFFFFF, 0xC0C0C0, 0x808080, 0x606060, 0x202020}, 
         0, 1);
-    
     unsigned char ***res2 = pic.get_map(resW, resH, new int[1] {0xFF0000}, 0);
-
     unsigned char *grid = build_grid(resW, resH);
 
     ViewPen pen(0);
-
     pen.clear(0);
 
     while(1)

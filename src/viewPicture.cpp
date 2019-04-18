@@ -139,7 +139,10 @@ void ViewPicture::refresh()
         READY = 0;
         //
         if(ms == MEMSIZE && w == WIDTH && h == HEIGHT && ws == WSIZE)
+        {
             memcpy(MEM, memTemp, ms);
+            free(memTemp);
+        }
         else
         {
             if(MAP)
@@ -152,15 +155,11 @@ void ViewPicture::refresh()
             HEIGHT = h;
             WSIZE = ws;
             //
-            MEM = (unsigned char *)calloc(MEMSIZE+1, sizeof(unsigned char));
-            memcpy(MEM, memTemp, MEMSIZE);
-            //
+            MEM = memTemp;
             MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
         }
         //就绪
         READY = 1;
-        //
-        free(memTemp);
     }
 }
 
@@ -273,7 +272,7 @@ unsigned char* ViewPicture::get_mem(int w, int h,
     int *repColor = NULL,
     int count = 0,
     float weight = 0)
- {
+{
     if(!READY || w < 1 || h < 1)
         return NULL;
     //
@@ -348,12 +347,22 @@ unsigned char* ViewPicture::get_mem(int w, int h,
     }
     //
     return mem;
- }
+}
+
+unsigned char*** ViewPicture::get_map(unsigned char *pic, int width, int height, int pw)
+{
+    return _mapInit(pic, width, height, pw);
+}
+
+unsigned char*** ViewPicture::get_map(unsigned char *pic, int picWidth, int picHeight, int mapWidth, int mapHeight, int pw)
+{
+    return _mapInit(pic, picWidth, picHeight, mapWidth, mapHeight, pw);
+}
 
 unsigned char*** ViewPicture::get_map(int w, int h,
     int *alphaColor = NULL,
     int count = 0)
- {
+{
     if(!READY || w < 1 || h < 1)
         return NULL;
     //
@@ -385,7 +394,7 @@ unsigned char*** ViewPicture::get_map(int w, int h,
     }
     //
     return map;
- }
+}
 
 void ViewPicture::release_map(unsigned char ***map, int w, int h)
 {
