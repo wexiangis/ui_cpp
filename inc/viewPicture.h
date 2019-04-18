@@ -36,7 +36,9 @@ public:
     void release_map(unsigned char ***map, int w, int h);
 
     //----- 其它 -----
-    void refresh();//刷新图片数据,重新从文件读入
+    //刷新图片数据,重新从文件读入
+    void refresh();
+    // 注意: 当图片大小发生改变时,将重新生成 MEM 和 MAP,之前 get_map() 获取的指针访问将是危险的 !!
     
     //----- 基本参数 -----
     char ready();//返回 0/异常(比如图片无法正常加载) 1/正常

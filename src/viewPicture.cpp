@@ -67,7 +67,7 @@ void _mapRelease(unsigned char ***map, int width, int height)
 //用完记得free()
 unsigned char* _intRGB_to_charRGB(int *color, int count)
 {
-    unsigned char *ret = (unsigned char *)calloc(count*3, 1);
+    unsigned char *ret = (unsigned char *)calloc(count*3, sizeof(unsigned char));
     for(int i = 0, j = 0; i < count; i++)
     {
         ret[j++] = (unsigned char)((color[i]&0xFF0000)>>16);
@@ -94,7 +94,7 @@ ViewPicture::ViewPicture(const char *picPath)
     READY = 0;
     //备份图片路径
     int pathLen = strlen(picPath);
-    PICPATH = (char *)calloc(pathLen+1, 1);
+    PICPATH = (char *)calloc(pathLen+1, sizeof(char));
     strcpy(PICPATH, picPath);
     //读取图片
     if(access(picPath, F_OK) == 0)
@@ -123,33 +123,44 @@ ViewPicture::~ViewPicture()
 
 void ViewPicture::refresh()
 {
+    unsigned char *memTemp = NULL;
+    int ms = 0, w = 0, h = 0, ws = 0;
     //读取图片
     if(access(PICPATH, F_OK) == 0)
     {
+        if(strstr(PICPATH, ".bmp") || strstr(PICPATH, ".BMP"))
+            memTemp = bmp_get(PICPATH, &ms, &w, &h, &ws);
+        else
+            memTemp = dejpeg(PICPATH,  &ms, &w, &h, &ws);
+    }
+    //
+    if(memTemp)
+    {
         READY = 0;
         //
-        if(MEM)
-        {
-            free(MEM);
-            MEM = NULL;
-        }
-        if(MAP)
-        {
-            _mapRelease(MAP, WIDTH, HEIGHT);
-            MAP = NULL;
-        }
-        //
-        if(strstr(PICPATH, ".bmp") || strstr(PICPATH, ".BMP"))
-            MEM = bmp_get(PICPATH, &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
+        if(ms == MEMSIZE && w == WIDTH && h == HEIGHT && ws == WSIZE)
+            memcpy(MEM, memTemp, ms);
         else
-            MEM = dejpeg(PICPATH,  &MEMSIZE, &WIDTH, &HEIGHT, &WSIZE);
-        //
-        if(!MEM)
-            return;
-        //
-        MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
+        {
+            if(MAP)
+                _mapRelease(MAP, WIDTH, HEIGHT);
+            if(MEM)
+                free(MEM);
+            //
+            MEMSIZE = ms;
+            WIDTH = w;
+            HEIGHT = h;
+            WSIZE = ws;
+            //
+            MEM = (unsigned char *)calloc(MEMSIZE+1, sizeof(unsigned char));
+            memcpy(MEM, memTemp, MEMSIZE);
+            //
+            MAP = _mapInit(MEM, WIDTH, HEIGHT, WSIZE);
+        }
         //就绪
         READY = 1;
+        //
+        free(memTemp);
     }
 }
 
@@ -163,9 +174,8 @@ void ViewPicture::set_replaceColor(int *distColot, int *repColor, int count)
     //
     for(i = 0; i < MEMSIZE;)
     {
-        for(j = 0; j < count; j++)
+        for(j = cc = 0; j < count; j++)
         {
-            cc = j*3;
             if(MEM[i] == rgbDist[cc] && 
                 MEM[i+1] == rgbDist[cc+1] &&
                 MEM[i+2] == rgbDist[cc+2])
@@ -175,6 +185,7 @@ void ViewPicture::set_replaceColor(int *distColot, int *repColor, int count)
                 MEM[i+2] = rgbRep[cc+2];
                 break;//命中一次就跳出 不再和其它颜色比对
             }
+            cc += 3;
         }
         i += 3;
     }
@@ -193,9 +204,8 @@ void ViewPicture::set_wsight(float weight, int *distColot, int count = 0)
         int result, i, j, k, cc;
         for(i = 0; i < MEMSIZE;)
         {
-            for(j = 0; j < count; j++)
+            for(j = cc = 0; j < count; j++)
             {
-                cc = j*3;
                 if(MEM[i] == rgbDist[cc] && 
                     MEM[i+1] == rgbDist[cc+1] &&
                     MEM[i+2] == rgbDist[cc+2])
@@ -215,6 +225,7 @@ void ViewPicture::set_wsight(float weight, int *distColot, int count = 0)
                     }
                     break;//命中一次就跳出 不再和其它颜色比对
                 }
+                cc += 3;
             }
             i += 3;
         }
@@ -267,7 +278,7 @@ unsigned char* ViewPicture::get_mem(int w, int h,
         return NULL;
     //
     int mem_size = w*h*3;
-    unsigned char *mem = (unsigned char *)calloc(mem_size+1, 1);
+    unsigned char *mem = (unsigned char *)calloc(mem_size+1, sizeof(unsigned char));
     int xC, yC, pxC, pyC, i; // xC,yC 为 mem 的位置计数; pxC,pyC 为 MAP 的位置计数
     float pxCf, pyCf, xPow, yPow;
     //
@@ -294,9 +305,8 @@ unsigned char* ViewPicture::get_mem(int w, int h,
         //
         for(i = 0; i < mem_size;)
         {
-            for(j = 0; j < count; j++)
+            for(j = cc = 0; j < count; j++)
             {
-                cc = j*3;
                 if(mem[i] == rgbDist[cc] && 
                     mem[i+1] == rgbDist[cc+1] &&
                     mem[i+2] == rgbDist[cc+2])
@@ -306,6 +316,7 @@ unsigned char* ViewPicture::get_mem(int w, int h,
                     mem[i+2] = rgbRep[cc+2];
                     break;//命中一次就跳出 不再和其它颜色比对
                 }
+                cc += 3;
             }
             i += 3;
         }
@@ -357,9 +368,8 @@ unsigned char*** ViewPicture::get_map(int w, int h,
         {
             for(yC = 0; yC < h; yC++)
             {
-                for(i = 0; i < count; i++)
+                for(i = cc = 0; i < count; i++)
                 {
-                    cc = i*3;
                     if(map[yC][xC][0] == alphaRGB[cc] &&
                         map[yC][xC][1] == alphaRGB[cc+1] &&
                         map[yC][xC][2] == alphaRGB[cc+2])
@@ -367,6 +377,7 @@ unsigned char*** ViewPicture::get_map(int w, int h,
                         map[yC][xC] = NULL;
                         break;
                     }
+                    cc += 3;
                 }
             }
         }

@@ -43,6 +43,7 @@ int clockS, clockE;
 //
 int main(int argc, char **argv)
 {
+    // ViewPicture pic("./test.jpg");
     ViewPicture pic("./res/bmp/test.bmp");
     // ViewPicture pic("./res/jpg/test.jpg");
     if(!pic.ready())
@@ -66,7 +67,7 @@ int main(int argc, char **argv)
 
     pen.clear(0);
 
-    // while(1)
+    while(1)
     {
         clock_count();
         std::cout<<"\n";
@@ -91,8 +92,11 @@ int main(int argc, char **argv)
         clock_count();
         std::cout<<"\n";
 
-        pen.refresh();
-        // sleep(1);
+        // pen.print_rgb(res, 0, 0, resW, resH, 0);
+        // pic.refresh();
+
+        pen.output();
+        sleep(1);
     }
 
     return 0;

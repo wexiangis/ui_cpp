@@ -31,7 +31,7 @@ public:
 
     //----- 绘图 -----
     //使能输出
-    void refresh();
+    void output();
     //清屏
     void clear(int color);
     //画点 alpha 透明度0~1 0表示不透明 1表示完全透明
@@ -43,6 +43,7 @@ public:
     void print_map(unsigned char ***map, int xStart, int yStart, int xSize, int ySize, float alpha);
     //栅格图纯色填充 grid[x] = 0/1
     void print_grid(unsigned char *grid, int color, int xStart, int yStart, int xSize, int ySize, float alpha);
+    //栅格图纯色填充 grid[x] = 0~255 代表颜色权重
     void print_grid2(unsigned char *grid, int color, int xStart, int yStart, int xSize, int ySize, float alpha);
 
     //----- 其它 -----

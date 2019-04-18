@@ -5,7 +5,7 @@
 //用完记得free()
 unsigned char* _intRGB_to_charRGB(int color)
 {
-    unsigned char *ret = (unsigned char *)calloc(3, 1);
+    unsigned char *ret = (unsigned char *)calloc(3, sizeof(unsigned char));
     ret[0] = (unsigned char)((color&0xFF0000)>>16);
     ret[1] = (unsigned char)((color&0x00FF00)>>8);
     ret[2] = (unsigned char)(color&0x0000FF);
@@ -41,7 +41,7 @@ void ViewPen::set_bright(unsigned char bright)
     amoled_brightSet(bright);
 }
 
-void ViewPen::refresh()
+void ViewPen::output()
 {
     amoled_print_en();
 }
@@ -99,7 +99,7 @@ void ViewPen::print_rgb(unsigned char *rgb, int xStart, int yStart, int xSize, i
     //
     unsigned char *line;
     int i, j, cc, mxS2, cc2, cc2p = xSize*3;
-    cc2 = yS + cc2p + xS*3;
+    cc2 = yS*cc2p + xS*3;
     //
     if(alpha == 0)
     {
