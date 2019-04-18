@@ -12,7 +12,7 @@
 //
 int main(int argc, char **argv)
 {
-    ViewPicture pic("./res/jpeg/test.jpg");
+    ViewPicture pic("./res/bmp/test2.bmp");
     if(!pic.ready())
     {
         std::cout<<"pic init err !"<<std::endl;
@@ -20,15 +20,22 @@ int main(int argc, char **argv)
     }
 
     int resW = pic.width(), resH = pic.height();
-    unsigned char *res = pic.get_mem(resW, resH, NULL, NULL, 0);
+    unsigned char *res = pic.get_mem(resW, resH, 
+        new int[5] {0xFF0000, 0x00FF00, 0x0000FF, 0xFFFFFF, 0x000000}, 
+        new int[5] {0xFFFFFF, 0xC0C0C0, 0x808080, 0x606060, 0x202020}, 
+        5, 1);
+    unsigned char *res2 = pic.get_mem(resW/2, resH/2, NULL, NULL, 0, 0.5);
+    unsigned char *res3 = pic.get_mem(resW/4, resH/4, NULL, NULL, 0, 0);
 
     ViewPen pen(0);
 
-    pen.clear(0xFF0000);
+    pen.clear(0);
 
-    while(1)
+    // while(1)
     {
-        pen.print_map(0, 0, resW, resH, res, 0);
+        pen.print_map(120, 50, resW, resH, res, 0);
+        pen.print_map(0, 0, resW/2, resH/2, res2, 0.5);
+        pen.print_map(0, 0, resW/4, resH/4, res3, 0.5);
         pen.refresh();
         sleep(1);
     }

@@ -7,7 +7,7 @@
 #include "jpeg.h"
 
 //
-unsigned char ***_mapInit(unsigned char *pic, int width, int height, int pw)
+unsigned char*** _mapInit(unsigned char *pic, int width, int height, int pw)
 {
     unsigned char ***map;
     int xC, yC;
@@ -27,7 +27,7 @@ unsigned char ***_mapInit(unsigned char *pic, int width, int height, int pw)
 }
 
 //
-unsigned char ***_mapInit(unsigned char *pic, int picWidth, int picHeight, int mapWidth, int mapHeight, int pw)
+unsigned char*** _mapInit(unsigned char *pic, int picWidth, int picHeight, int mapWidth, int mapHeight, int pw)
 {
     unsigned char ***map;
     int xC, yC, pxC, pyC;
@@ -57,15 +57,46 @@ unsigned char ***_mapInit(unsigned char *pic, int picWidth, int picHeight, int m
 void _mapRelease(unsigned char ***map, int width, int height)
 {
     int i;
-    //
     if(map == NULL)
         return;
-    //
     for(i = 0; i < height; i++)
         free(map[i]);
     free(map);
 }
 
+//用完记得free()
+unsigned char* _intRGB_to_charRGB(int color)
+{
+    unsigned char *ret = (unsigned char *)calloc(3, 1);
+    ret[0] = (unsigned char)((color&0xFF0000)>>16);
+    ret[1] = (unsigned char)((color&0x00FF00)>>8);
+    ret[2] = (unsigned char)(color&0x0000FF);
+    return ret;
+}
+
+//用完记得free()
+unsigned char* _intRGB_to_charRGB(int *color, int count)
+{
+    unsigned char *ret = (unsigned char *)calloc(count*3, 1);
+    for(int i = 0, j = 0; i < count; i++)
+    {
+        ret[j++] = (unsigned char)((color[i]&0xFF0000)>>16);
+        ret[j++] = (unsigned char)((color[i]&0x00FF00)>>8);
+        ret[j++] = (unsigned char)(color[i]&0x0000FF);
+    }
+    return ret;
+}
+
+int _charRGB_to_intRGB(unsigned char *color)
+{
+    // return ((color[0]<<16) | (color[1]<<8) | color[0]);
+    int ret = color[0];
+    ret = (ret<<8) | color[1];
+    ret = (ret<<8) | color[2];
+    return ret;
+}
+
+//
 ViewPicture::ViewPicture(const char *picPath)
 {
     if(picPath == NULL)
@@ -169,51 +200,227 @@ void ViewPicture::refresh()
     }
 }
 
- unsigned char* ViewPicture::get_mem(int w, int h,
+void ViewPicture::set_replaceColor(int *distColot, int *repColor, int count)
+{
+    if(!READY || !distColot || !repColor || !count)
+        return;
+    unsigned char *rgbDist = _intRGB_to_charRGB(distColot, count);
+    unsigned char *rgbRep = _intRGB_to_charRGB(repColor, count);
+    int i, j, cc;
+    //
+    for(i = 0; i < MEMSIZE;)
+    {
+        for(j = 0; j < count; j++)
+        {
+            cc = j*3;
+            if(MEM[i] == rgbDist[cc] && 
+                MEM[i+1] == rgbDist[cc+1] &&
+                MEM[i+2] == rgbDist[cc+2])
+            {
+                MEM[i] = rgbRep[cc];
+                MEM[i+1] = rgbRep[cc+1];
+                MEM[i+2] = rgbRep[cc+2];
+                break;//命中一次就跳出 不再和其它颜色比对
+            }
+        }
+        i += 3;
+    }
+    //
+    free(rgbDist);
+    free(rgbRep);
+}
+
+void ViewPicture::set_wsight(float weight, int *distColot, int count = 0)
+{
+    if(!READY || weight == 0 || weight == 1)
+        return;
+    if(count > 0 && distColot)
+    {
+        unsigned char *rgbDist = _intRGB_to_charRGB(distColot, count);
+        int result, i, j, k, cc;
+        for(i = 0; i < MEMSIZE;)
+        {
+            for(j = 0; j < count; j++)
+            {
+                cc = j*3;
+                if(MEM[i] == rgbDist[cc] && 
+                    MEM[i+1] == rgbDist[cc+1] &&
+                    MEM[i+2] == rgbDist[cc+2])
+                {
+                    for(k = 0; k < 3; k++)
+                    {
+                        if(!MEM[i+k])//数值为0时无法加权
+                            MEM[i+k] = 1;
+                        //
+                        result = MEM[i+k]*weight;
+                        if(result > 0xFF)
+                            MEM[i+k] = 0xFF;
+                        else if(result < 0)
+                            MEM[i+k] = 0;
+                        else
+                            MEM[i+k] = result;
+                    }
+                    break;//命中一次就跳出 不再和其它颜色比对
+                }
+            }
+            i += 3;
+        }
+        //
+        free(rgbDist);
+    }
+    else
+    {
+        int result, i, j;
+        for(i = 0; i < MEMSIZE;)
+        {
+            for(j = 0; j < 3; j++, i++)
+            {
+                if(!MEM[i])//数值为0时无法加权
+                    MEM[i] = 1;
+                //
+                result = MEM[i]*weight;
+                if(result > 0xFF)
+                    MEM[i] = 0xFF;
+                else if(result < 0)
+                    MEM[i] = 0;
+                else
+                    MEM[i] = result;
+            }
+        }
+    }
+}
+
+int ViewPicture::get_color(int xy[2])
+{
+    if(!READY || !xy)
+        return 0;
+    return _charRGB_to_intRGB(MAP[xy[1]][xy[0]]);
+}
+
+int ViewPicture::get_color(int x, int y)
+{
+    if(!READY || x < 0 || x > WIDTH-1 || y < 0 || y > HEIGHT-1)
+        return 0;
+    return _charRGB_to_intRGB(MAP[y][x]);
+}
+
+unsigned char* ViewPicture::get_mem(int w, int h,
     int *distColot = NULL,
     int *repColor = NULL,
-    int count = 0)
+    int count = 0,
+    float weight = 0)
  {
-    if(!READY)
+    if(!READY || w < 1 || h < 1)
         return NULL;
     //
     int mem_size = w*h*3;
     unsigned char *mem = (unsigned char *)calloc(mem_size+1, 1);
-    int xC, yC, pxC, pyC, i;
+    int xC, yC, pxC, pyC, i; // xC,yC 为要返回的mem的位置计数; pxC,pyC 为原始图片的位置计数
     float pxCf, pyCf, xPow, yPow;
     //
     xPow = (float)WIDTH/w;
-    yPow = (float)HEIGHT/h;
+    yPow = (float)HEIGHT/h;//
     //
-    i = 0;
-    for(yC = pyCf = 0; yC < h; yC++, pyCf+=yPow)
+    for(i = yC = 0, pyCf = 0; yC < h; yC++, pyCf+=yPow)
     {
-        pyC = pyCf;
-        for(xC = pxCf = 0; xC < w; xC++, pxCf+=xPow)
+        pyC = pyCf;//浮点转int
+        for(xC = 0, pxCf = 0; xC < w; xC++, pxCf+=xPow)
         {
-            pxC = pxCf;
+            pxC = pxCf;//浮点转int
             mem[i++] = MAP[pyC][pxC][0];
             mem[i++] = MAP[pyC][pxC][1];
             mem[i++] = MAP[pyC][pxC][2];
         }
     }
     //颜色处理
-
+    if(count > 0 && distColot && repColor)
+    {
+        unsigned char *rgbDist = _intRGB_to_charRGB(distColot, count);
+        unsigned char *rgbRep = _intRGB_to_charRGB(repColor, count);
+        int j, cc;
+        //
+        for(i = 0; i < mem_size;)
+        {
+            for(j = 0; j < count; j++)
+            {
+                cc = j*3;
+                if(mem[i] == rgbDist[cc] && 
+                    mem[i+1] == rgbDist[cc+1] &&
+                    mem[i+2] == rgbDist[cc+2])
+                {
+                    mem[i] = rgbRep[cc];
+                    mem[i+1] = rgbRep[cc+1];
+                    mem[i+2] = rgbRep[cc+2];
+                    break;//命中一次就跳出 不再和其它颜色比对
+                }
+            }
+            i += 3;
+        }
+        //
+        free(rgbDist);
+        free(rgbRep);
+    }
+    //权重处理
+    if(weight && weight != 1)
+    {
+        int result, j;
+        for(i = 0; i < mem_size;)
+        {
+            for(j = 0; j < 3; j++, i++)
+            {
+                //数值为0时无法加权
+                if(!mem[i])
+                    mem[i] = 1;
+                //
+                result = mem[i]*weight;
+                if(result > 0xFF)
+                    mem[i] = 0xFF;
+                else if(result < 0)
+                    mem[i] = 0;
+                else
+                    mem[i] = result;
+            }
+        }
+    }
     //
     return mem;
  }
 
- unsigned char*** ViewPicture::get_map(int w, int h,
-        int *distColot = NULL,
-        int *repColor = NULL,
-        int count = 0,
-        int *alphaColor = NULL,
-        int count2 = 0)
+unsigned char*** ViewPicture::get_map(int w, int h,
+    int *alphaColor = NULL,
+    int count = 0)
  {
-    if(!READY)
+    if(!READY || w < 1 || h < 1)
         return NULL;
-    
-    return NULL;
+    //
+    unsigned char ***map = _mapInit(MEM, WIDTH, HEIGHT, w, h, WSIZE);
+    //透明色处理
+    if(map && count > 0 && alphaColor)
+    {
+        unsigned char *alphaRGB = _intRGB_to_charRGB(alphaColor, count);
+        int xC, yC;
+        int i, cc;
+        for(xC = 0; xC < w; xC++)
+        {
+            for(yC = 0; yC < h; yC++)
+            {
+                for(i = 0; i < count; i++)
+                {
+                    cc = i*3;
+                    if(map[yC][xC][0] == alphaRGB[cc] &&
+                        map[yC][xC][1] == alphaRGB[cc+1] &&
+                        map[yC][xC][2] == alphaRGB[cc+2])
+                    {
+                        map[yC][xC] = NULL;
+                        break;
+                    }
+                }
+            }
+        }
+        free(alphaRGB);
+    }
+    //
+    return map;
  }
 
 void ViewPicture::release_map(unsigned char ***map, int w, int h)

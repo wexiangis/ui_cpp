@@ -94,18 +94,33 @@ void ViewPen::print_map(int xStart, int yStart, int xSize, int ySize, unsigned c
         for(int i = 0; i < yL; i++)
             memcpy(AS->data.backupMap[myS+i][mxS], &rgb[(yS+i)*xSize*3 + xS*3], xL*3);
     }
-    // else
-    // {
-    //     unsigned char *line;
-    //     int xE = xS + xL, yE = yS + yL;
-    //     for(int i = 0; i < yL; i++)
-    //     {
-    //         line = &rgb[(yS+i)*xSize*3 + xS*3];
-    //         for(j = 0; j < xL; j++)
-    //         {
-
-    //         }
-    //     }
-    // }
-    
+    else if(alpha < 1)//等于1就不用画了
+    {
+        unsigned char *line;
+        int xE = xS + xL, yE = yS + yL;
+        int i, j, cc, mxS2;
+        for(i = 0; i < yL; i++, myS++)
+        {
+            line = &rgb[(yS+i)*xSize*3 + xS*3];
+            for(j = 0, mxS2 = mxS; j < xL; j++, mxS2++)
+            {
+                cc = j*3;
+#if(AMOLED_RGB_MODE == 1)
+                AS->data.backupMap[myS][mxS2][0] = 
+                    AS->data.backupMap[myS][mxS2][0]*alpha + line[cc]*(1-alpha);
+                AS->data.backupMap[myS][mxS2][1] = 
+                    AS->data.backupMap[myS][mxS2][1]*alpha + line[cc+1]*(1-alpha);
+                AS->data.backupMap[myS][mxS2][2] = 
+                    AS->data.backupMap[myS][mxS2][2]*alpha + line[cc+2]*(1-alpha);
+#else
+                AS->data.backupMap[myS][mxS2][2] = 
+                    AS->data.backupMap[myS][mxS2][2]*alpha + line[cc]*(1-alpha);
+                AS->data.backupMap[myS][mxS2][1] = 
+                    AS->data.backupMap[myS][mxS2][1]*alpha + line[cc+1]*(1-alpha);
+                AS->data.backupMap[myS][mxS2][0] = 
+                    AS->data.backupMap[myS][mxS2][0]*alpha + line[cc+2]*(1-alpha);
+#endif
+            }
+        }
+    }
 }

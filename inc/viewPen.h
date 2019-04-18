@@ -37,7 +37,7 @@ public:
     //画点 alpha 透明度0~1 0表示不透明 1表示完全透明
     void print(int x, int y, int color);
     void print(int x, int y, int color, float alpha);
-    //面填充
+    //面填充 alpha 透明度0~1 0表示不透明 1表示完全透明
     void print_map(int xStart, int yStart, int xSize, int ySize, unsigned char *rgb, float alpha);
 
     //----- 其它 -----

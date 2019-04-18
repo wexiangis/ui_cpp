@@ -14,24 +14,30 @@ public:
     explicit ViewPicture(const char *picPath);
     ~ViewPicture();
 
+    //----- 修改原图数据 -----
+    void set_replaceColor(int *distColot, int *repColor, int count);
+    void set_wsight(float weight, int *distColot, int count);
+
+    //----- 采集原图数据 -----
+    int get_color(int xy[2]);
+    int get_color(int x, int y);
+
     //----- 获取 rgb 数据指针 (用完记得free) -----
     unsigned char* get_mem(int w, int h, //指定width,height 获得缩放后的rgb图片数据
         int *distColot, //指定目标颜色的数组
         int *repColor,  //指定替换颜色的数组
-        int count);     //颜色个数
+        int count,      //颜色个数
+        float weight);  //系数加权: color*weight // 0,1/不起用 >0/启用
 
     //----- 获取 map[y][x][3] 指针 (用完记得 release_map) -----
     unsigned char*** get_map(int w, int h, //指定width,height 获得缩放后的图片数据
-        int *distColot,
-        int *repColor,
-        int count,
         int *alphaColor, //指定透明色数组(目标指针将为NULL,例如 map[Y][X]=NULL
-        int count2);     //透明色个数
+        int count);      //透明色个数
     void release_map(unsigned char ***map, int w, int h);
 
     //----- 其它 -----
-    void refresh();//刷新图片数据(重新从文件读入)
-    void refresh(const char *picPath);//刷新图片数据(重新从文件读入) 更换图片
+    void refresh();//刷新图片数据,重新从文件读入
+    void refresh(const char *picPath);//刷新图片数据,更换图片,重新从文件读入
     
     //----- 基本参数 -----
     char ready();//返回 0/异常(比如图片无法正常加载) 1/正常
