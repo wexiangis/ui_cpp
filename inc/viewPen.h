@@ -38,7 +38,12 @@ public:
     void print(int x, int y, int color);
     void print(int x, int y, int color, float alpha);
     //面填充 alpha 透明度0~1 0表示不透明 1表示完全透明
-    void print_map(int xStart, int yStart, int xSize, int ySize, unsigned char *rgb, float alpha);
+    void print_rgb(unsigned char *rgb, int xStart, int yStart, int xSize, int ySize, float alpha);
+    //面填充 map[y][x] = NULL 时跳过该点
+    void print_map(unsigned char ***map, int xStart, int yStart, int xSize, int ySize, float alpha);
+    //栅格图纯色填充 grid[x] = 0/1
+    void print_grid(unsigned char *grid, int color, int xStart, int yStart, int xSize, int ySize, float alpha);
+    void print_grid2(unsigned char *grid, int color, int xStart, int yStart, int xSize, int ySize, float alpha);
 
     //----- 其它 -----
     

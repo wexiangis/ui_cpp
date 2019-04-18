@@ -1,31 +1,64 @@
-
+#include <stdio.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "viewPen.h"
 #include "viewPicture.h"
 #include <iostream>
 
+void clock_count()
+{
+    static int last = 0, th = 0;
+    int current = clock();
+    std::cout<<"clock "<<th<<" : "<<current-last<<std::endl;
+    last = current;
+    th += 1;
+}
+
+unsigned char* build_grid(int w, int h)
+{
+    unsigned char *ret = new unsigned char[w*h];
+    int xC, yC, cc;
+    unsigned char weight = 0;
+
+    for(yC = cc = 0; yC < h; yC++)
+    {
+        for(xC = weight = 0; xC < w; xC++)
+        {
+            ret[cc++] = weight++;
+        }
+    }
+
+    return ret;
+}
+
 #define TEST_MODE 1
 
 #if(TEST_MODE == 1)
 
+int clockS, clockE;
+
 //
 int main(int argc, char **argv)
 {
-    ViewPicture pic("./res/bmp/test2.bmp");
+    ViewPicture pic("./res/bmp/test.bmp");
+    // ViewPicture pic("./res/jpg/test.jpg");
     if(!pic.ready())
     {
         std::cout<<"pic init err !"<<std::endl;
         return -1;
     }
 
-    int resW = pic.width(), resH = pic.height();
+    int resW = 700, resH = 500;
+
     unsigned char *res = pic.get_mem(resW, resH, 
         new int[5] {0xFF0000, 0x00FF00, 0x0000FF, 0xFFFFFF, 0x000000}, 
         new int[5] {0xFFFFFF, 0xC0C0C0, 0x808080, 0x606060, 0x202020}, 
-        5, 1);
-    unsigned char *res2 = pic.get_mem(resW/2, resH/2, NULL, NULL, 0, 0.5);
-    unsigned char *res3 = pic.get_mem(resW/4, resH/4, NULL, NULL, 0, 0);
+        0, 1);
+    
+    unsigned char ***res2 = pic.get_map(resW, resH, new int[1] {0xFF0000}, 0);
+
+    unsigned char *grid = build_grid(resW, resH);
 
     ViewPen pen(0);
 
@@ -33,11 +66,23 @@ int main(int argc, char **argv)
 
     // while(1)
     {
-        pen.print_map(120, 50, resW, resH, res, 0);
-        pen.print_map(0, 0, resW/2, resH/2, res2, 0.5);
-        pen.print_map(0, 0, resW/4, resH/4, res3, 0.5);
+        clock_count();
+        pen.print_rgb(res, 0, 0, resW, resH, 0);
+        clock_count();
+        pen.print_map(res2, 50, 50, resW, resH, 0);
+        clock_count();
+        pen.print_grid2(grid, 0xFF0000, 100, 100, resW, resH, 0);
+        clock_count();
+
+        pen.print_rgb(res, 0, 0+200, resW, resH, 0.5);
+        clock_count();
+        pen.print_map(res2, 50, 50+200, resW, resH, 0.5);
+        clock_count();
+        pen.print_grid2(grid, 0x0000FF, 100, 100+200, resW, resH, 0.5);
+        clock_count();
+
         pen.refresh();
-        sleep(1);
+        // sleep(1);
     }
 
     return 0;

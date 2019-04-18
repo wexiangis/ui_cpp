@@ -65,16 +65,6 @@ void _mapRelease(unsigned char ***map, int width, int height)
 }
 
 //用完记得free()
-unsigned char* _intRGB_to_charRGB(int color)
-{
-    unsigned char *ret = (unsigned char *)calloc(3, 1);
-    ret[0] = (unsigned char)((color&0xFF0000)>>16);
-    ret[1] = (unsigned char)((color&0x00FF00)>>8);
-    ret[2] = (unsigned char)(color&0x0000FF);
-    return ret;
-}
-
-//用完记得free()
 unsigned char* _intRGB_to_charRGB(int *color, int count)
 {
     unsigned char *ret = (unsigned char *)calloc(count*3, 1);
@@ -315,7 +305,7 @@ unsigned char* ViewPicture::get_mem(int w, int h,
     //
     int mem_size = w*h*3;
     unsigned char *mem = (unsigned char *)calloc(mem_size+1, 1);
-    int xC, yC, pxC, pyC, i; // xC,yC 为要返回的mem的位置计数; pxC,pyC 为原始图片的位置计数
+    int xC, yC, pxC, pyC, i; // xC,yC 为 mem 的位置计数; pxC,pyC 为 MAP 的位置计数
     float pxCf, pyCf, xPow, yPow;
     //
     xPow = (float)WIDTH/w;
