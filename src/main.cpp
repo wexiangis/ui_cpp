@@ -4,6 +4,7 @@
 
 #include "viewPen.h"
 #include "viewPicture.h"
+#include "viewShape.h"
 #include <iostream>
 
 int clock_count()
