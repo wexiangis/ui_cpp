@@ -16,11 +16,11 @@ public:
     //获取圆形: rad > 0, 其它 = 0
     //获取圆环: rad, rad2 > 0 且 rad > rad2, 其它 = 0
     //获取扇形,分段圆环: angle, degree > 0; angle/开角角度 degree/旋转角度
-    unsigned char *get_grid(int rad, int rad2, int angle, int degree, int &xErr, int &yErr);
+    unsigned char* get_grid(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight);
     //获取直线,折线,多边形
-    unsigned char *get_grid(int w, int h, int lineSize, int &xErr, int &yErr);
+    unsigned char* get_grid(int w, int h, int lineSize, int &xErr, int &yErr);
     //获取直线,折线,多边形
-    unsigned char *get_mem(int w, int h, int color, int lineSize, int &xErr, int &yErr);
+    unsigned char* get_mem(int w, int h, int color, int lineSize, int &xErr, int &yErr);
     
     //----- 基本参数 -----
     int line();

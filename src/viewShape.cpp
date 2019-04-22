@@ -109,17 +109,16 @@ int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *
 
 const double VS_PI = 3.14159265358979323846;
 
-#include <stdio.h>
-Polygon::Polygon(int line)
+Polygon::Polygon(int line = 0)
 {
-    if(line < 0)
+    if(line < 1)//圆
+    {
+        LINE = 0;
+        DOT = 0;
         return;
+    }
     //
     LINE = line;
-    //
-    if(LINE == 0)//圆
-        return;
-    //
     DOT = new int[(LINE+1)*2];
     //
     if(LINE == 1)//直线
@@ -131,16 +130,16 @@ Polygon::Polygon(int line)
     }
     else if(LINE == 2)//折线
     {
-        DOT[0] = -10;
-        DOT[1] = 0;
+        DOT[0] = -9;
+        DOT[1] = -5;
         DOT[2] = 0;
-        DOT[3] = 17;
-        DOT[4] = 10;
-        DOT[5] = 0;
+        DOT[3] = 10;
+        DOT[4] = 9;
+        DOT[5] = -5;
     }
     else//多边形
     {
-        int radius = 10;
+        int radius = 100;
         double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
         //
         if(LINE%2)//单数
@@ -150,25 +149,10 @@ Polygon::Polygon(int line)
         //
         for(int i = 0, j = 0; i < LINE; i++)
         {
-            degreeCount = -VS_PI*2*i/LINE;
-            degreeCount += degreeStart;
+            degreeCount = degreeStart - VS_PI*2*i/LINE;
             //计算X,Y坐标
-            DOT[j] = radius*cos(degreeCount);
-            DOT[j+1] = radius*sin(degreeCount);
-            //根据所在象限矫正X,Y的正负值
-            if(degreeCount > 0)
-                ;
-            else if(degreeCount > -VS_PI/2)
-                DOT[j+1] = -DOT[j+1];
-            else if(degreeCount > -VS_PI)
-            {
-                DOT[j] = -DOT[j];
-                DOT[j+1] = -DOT[j+1];
-            }
-            else
-                DOT[j] = -DOT[j];
-            //
-            fprintf(stdout, "dot[%d]: X/%d, Y/%d\n", i, DOT[j], DOT[j+1]);
+            DOT[j] = round(radius*cos(degreeCount));
+            DOT[j+1] = round(radius*sin(degreeCount));
             //
             j += 2;
         }
@@ -177,7 +161,26 @@ Polygon::Polygon(int line)
 
 Polygon::Polygon(int line, int *xy)
 {
-    
+    if(line < 0 || !xy)
+    {
+        LINE = 0;
+        return;
+    }
+    //
+    LINE = line;
+    //
+    if(LINE == 0)//圆
+        return;
+    //
+    DOT = new int[(LINE+1)*2];
+    //
+    for(int i = 0, j = 0; i < LINE; i++)
+    {
+        DOT[j] = xy[j];
+        j += 1;
+        DOT[j] = xy[j];
+        j += 1;
+    }
 }
 
 Polygon::~Polygon()
@@ -186,3 +189,190 @@ Polygon::~Polygon()
         delete[] DOT;
 }
 
+unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight)
+{
+    int RAD = rad;
+    //画圆相关
+    int circle_a, circle_b;
+    int circle_di;
+    int circle_rad = RAD;
+    int circle_size = rad2 > RAD ? 0 : (RAD - rad2);
+    //栅格图相关
+    int xSize = RAD*2+1, ySize = xSize;
+    int xMid = RAD+1, yMid = xMid;
+    unsigned char *mem;
+    unsigned char **memBUff;
+    //栅格图指针准备
+    if(grid)
+    {
+        mem = grid;
+        //
+        if(gw && (*gw < xSize || *gw < ySize)){
+            RAD = (*gw/2)-1;
+            circle_rad = RAD;
+        }else if(gh && (*gh < xSize || *gh < ySize)){
+            RAD = (*gh/2)-1;
+            circle_rad = RAD;
+        }
+        //
+        if(gw){
+            xSize = *gw;
+            xMid = xSize/2;
+        }
+        if(gh){
+            ySize = *gh;
+            yMid = ySize/2;
+        }
+    }
+    else
+        mem = new unsigned char[xSize*ySize];
+    memBUff = new unsigned char*[ySize];
+    for(int i = 0, j = 0; i < ySize; i++)
+    {
+        memBUff[i] = &mem[j];
+        j += xSize;
+    }
+    //画扇形,扇圆环
+    if(angle > 0 && angle < 360)
+    {
+        //扇形
+        int sectorBuff[RAD+1][2];
+        int sectorCount;
+        double degreeStart, degreeEnd;
+        //
+        degreeStart = (degree%360) - (angle%360)/2;
+        if(degreeStart < 0)
+            degreeStart += 360;
+        degreeEnd = degreeStart + angle - 1;
+        //
+        for(;circle_rad > RAD - circle_size && circle_rad > 0; circle_rad--)
+        {
+            circle_a = 0;
+            circle_b = circle_rad;
+            circle_di = 3 - (circle_rad<<1);
+            sectorCount = 0;
+            while(circle_a <= circle_b)
+            {
+                sectorBuff[sectorCount][0] = circle_a;
+                sectorBuff[sectorCount][1] = circle_b;
+                sectorCount += 1;
+                //
+                circle_a++;
+                //使用Bresenham算法画圆
+                if(circle_di < 0)
+                    circle_di += 4*circle_a + 6;
+                else
+                {
+                    circle_di += 10 + 4*(circle_a - circle_b);
+                    circle_b--;
+                }
+            }
+            //
+            double degreeDivOf45 = 45/(double)sectorCount, degreeCount;
+            int temp = round(degreeStart/degreeDivOf45);
+            int block = temp/sectorCount, blockCount = temp%sectorCount;
+            //
+            for(degreeCount = temp*degreeDivOf45;
+                degreeCount <= degreeEnd;
+                degreeCount+=degreeDivOf45)
+            {
+                switch(block)
+                {
+                    case 0:
+                        memBUff[yMid - sectorBuff[blockCount][1]][xMid + sectorBuff[blockCount][0]] = weight;
+                        memBUff[yMid - sectorBuff[blockCount][1] + 1][xMid + sectorBuff[blockCount][0]] = weight;
+                        break;
+                    case 1:
+                        memBUff[yMid - sectorBuff[sectorCount-blockCount-1][0]][xMid + sectorBuff[sectorCount-blockCount-1][1]] = weight;
+                        memBUff[yMid - sectorBuff[sectorCount-blockCount-1][0]][xMid + sectorBuff[sectorCount-blockCount-1][1] - 1] = weight;
+                        break;
+                    case 2:
+                        memBUff[yMid + sectorBuff[blockCount][0]][xMid + sectorBuff[blockCount][1]] = weight;
+                        memBUff[yMid + sectorBuff[blockCount][0]][xMid + sectorBuff[blockCount][1] - 1] = weight;
+                        break;
+                    case 3:
+                        memBUff[yMid + sectorBuff[sectorCount-blockCount-1][1]][xMid + sectorBuff[sectorCount-blockCount-1][0]] = weight;
+                        memBUff[yMid + sectorBuff[sectorCount-blockCount-1][1] - 1][xMid + sectorBuff[sectorCount-blockCount-1][0]] = weight;
+                        break;
+                    case 4:
+                        memBUff[yMid + sectorBuff[blockCount][1]][xMid - sectorBuff[blockCount][0]] = weight;
+                        memBUff[yMid + sectorBuff[blockCount][1] - 1][xMid - sectorBuff[blockCount][0]] = weight;
+                        break;
+                    case 5:
+                        memBUff[yMid + sectorBuff[sectorCount-blockCount-1][0]][xMid - sectorBuff[sectorCount-blockCount-1][1]] = weight;
+                        memBUff[yMid + sectorBuff[sectorCount-blockCount-1][0]][xMid - sectorBuff[sectorCount-blockCount-1][1] + 1] = weight;
+                        break;
+                    case 6:
+                        memBUff[yMid - sectorBuff[blockCount][0]][xMid - sectorBuff[blockCount][1]] = weight;
+                        memBUff[yMid - sectorBuff[blockCount][0]][xMid - sectorBuff[blockCount][1] + 1] = weight;
+                        break;
+                    case 7:
+                        memBUff[yMid - sectorBuff[sectorCount-blockCount-1][1]][xMid - sectorBuff[sectorCount-blockCount-1][0]] = weight;
+                        memBUff[yMid - sectorBuff[sectorCount-blockCount-1][1] + 1][xMid - sectorBuff[sectorCount-blockCount-1][0]] = weight;
+                        break;
+                }
+                //
+                if(++blockCount == sectorCount)
+                {
+                    blockCount = 0;
+                    if(++block == 8)
+                        block = 0;
+                }
+            }
+        }
+    }
+    //画圆
+    else
+    {
+        for(;circle_rad > RAD - circle_size && circle_rad > 0; circle_rad--)
+        {
+            circle_a = 0;
+            circle_b = circle_rad;
+            circle_di = 3 - (circle_rad<<1);
+            while(circle_a <= circle_b)
+            {
+                //1
+                memBUff[yMid - circle_b][xMid + circle_a] = weight;
+                memBUff[yMid - circle_b + 1][xMid + circle_a] = weight;
+                //2
+                memBUff[yMid - circle_a][xMid + circle_b] = weight;
+                memBUff[yMid - circle_a][xMid + circle_b - 1] = weight;
+                //3
+                memBUff[yMid + circle_a][xMid + circle_b] = weight;
+                memBUff[yMid + circle_a][xMid + circle_b - 1] = weight;
+                //4
+                memBUff[yMid + circle_b][xMid + circle_a] = weight;
+                memBUff[yMid + circle_b - 1][xMid + circle_a] = weight;
+                //5
+                memBUff[yMid + circle_b][xMid - circle_a] = weight;
+                memBUff[yMid + circle_b - 1][xMid - circle_a] = weight;
+                //6
+                memBUff[yMid + circle_a][xMid - circle_b] = weight;
+                memBUff[yMid + circle_a][xMid - circle_b + 1] = weight;
+                //7
+                memBUff[yMid - circle_a][xMid - circle_b] = weight;
+                memBUff[yMid - circle_a][xMid - circle_b + 1] = weight;
+                //8
+                memBUff[yMid - circle_b][xMid - circle_a] = weight;
+                memBUff[yMid - circle_b + 1][xMid - circle_a] = weight;
+                //
+                circle_a++;
+                //使用Bresenham算法画圆
+                if(circle_di < 0)
+                    circle_di += 4*circle_a + 6;
+                else
+                {
+                    circle_di += 10 + 4*(circle_a - circle_b);
+                    circle_b--;
+                }
+            }
+        }
+    }
+    //
+    if(gw) *gw = xSize;
+    if(gh) *gh = ySize;
+    //
+    delete[] memBUff;
+    //
+    return mem;
+}

@@ -42,7 +42,25 @@ unsigned char* build_grid(int w, int h)
 //
 int main(int argc, char **argv)
 {
-    Polygon pg(4);
+    int rad = 50, w = 300, h = 300;
+
+    unsigned char *grid = new unsigned char[w*h];
+
+    Polygon pg(0);
+
+    pg.get_grid(rad, rad-10, 120, 0, grid, &w, &h, 0xFF);
+    rad += 20;
+    pg.get_grid(rad, rad-10, 120, 30, grid, &w, &h, 0xC0);
+    rad += 20;
+    pg.get_grid(rad, rad-10, 120, 60, grid, &w, &h, 0x80);
+    rad += 20;
+    pg.get_grid(rad, rad-10, 120, 90, grid, &w, &h, 0x40);
+
+    ViewPen pen(0);
+    pen.clear(0);
+
+    pen.print_grid(grid, 0xFF0000, 100, 100, w, h, 0);
+    pen.output();
 
     return 0;
 }

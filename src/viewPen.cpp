@@ -1,11 +1,9 @@
-#include <stdlib.h>
-#include <string.h>
 #include "viewPen.h"
 
-//用完记得free()
+//用完记得 delete[]
 unsigned char* _intRGB_to_charRGB(int color)
 {
-    unsigned char *ret = (unsigned char *)calloc(3, sizeof(unsigned char));
+    unsigned char *ret = new unsigned char[3];
     ret[0] = (unsigned char)((color&0xFF0000)>>16);
     ret[1] = (unsigned char)((color&0x00FF00)>>8);
     ret[2] = (unsigned char)(color&0x0000FF);
@@ -284,7 +282,7 @@ void ViewPen::print_grid(unsigned char *grid, int color, int xStart, int yStart,
         }
     }
     //
-    free(col);
+    delete[] col;
 }
 
 void ViewPen::print_grid2(unsigned char *grid, int color, int xStart, int yStart, int xSize, int ySize, float alpha = 0)
@@ -416,5 +414,5 @@ void ViewPen::print_grid2(unsigned char *grid, int color, int xStart, int yStart
         }
     }
     //
-    free(col);
+    delete[] col;
 }
