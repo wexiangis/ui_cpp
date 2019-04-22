@@ -1,5 +1,6 @@
 
 #include "viewShape.h"
+#include <math.h>
 
 //递归填充
 inline void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, char dir)
@@ -106,7 +107,9 @@ int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *
     return distance + 2;
 }
 
+const double VS_PI = 3.14159265358979323846;
 
+#include <stdio.h>
 Polygon::Polygon(int line)
 {
     if(line < 0)
@@ -114,19 +117,19 @@ Polygon::Polygon(int line)
     //
     LINE = line;
     //
-    if(LINE == 0)
+    if(LINE == 0)//圆
         return;
     //
     DOT = new int[(LINE+1)*2];
     //
-    if(LINE == 1)
+    if(LINE == 1)//直线
     {
         DOT[0] = -1;
         DOT[1] = 0;
         DOT[2] = 1;
         DOT[3] = 0;
     }
-    else if(LINE == 2)
+    else if(LINE == 2)//折线
     {
         DOT[0] = -10;
         DOT[1] = 0;
@@ -135,21 +138,40 @@ Polygon::Polygon(int line)
         DOT[4] = 10;
         DOT[5] = 0;
     }
-    else if(LINE == 3)
+    else//多边形
     {
-        ;
-    }
-    else if(LINE == 4)
-    {
-        ;
-    }
-    else if(LINE == 5)
-    {
-        ;
-    }
-    else if(LINE == 6)
-    {
-        ;
+        int radius = 10;
+        double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
+        //
+        if(LINE%2)//单数
+            degreeStart = VS_PI/2;
+        else//双数
+            degreeStart = VS_PI/2 - VS_PI*2/LINE/2;
+        //
+        for(int i = 0, j = 0; i < LINE; i++)
+        {
+            degreeCount = -VS_PI*2*i/LINE;
+            degreeCount += degreeStart;
+            //计算X,Y坐标
+            DOT[j] = radius*cos(degreeCount);
+            DOT[j+1] = radius*sin(degreeCount);
+            //根据所在象限矫正X,Y的正负值
+            if(degreeCount > 0)
+                ;
+            else if(degreeCount > -VS_PI/2)
+                DOT[j+1] = -DOT[j+1];
+            else if(degreeCount > -VS_PI)
+            {
+                DOT[j] = -DOT[j];
+                DOT[j+1] = -DOT[j+1];
+            }
+            else
+                DOT[j] = -DOT[j];
+            //
+            fprintf(stdout, "dot[%d]: X/%d, Y/%d\n", i, DOT[j], DOT[j+1]);
+            //
+            j += 2;
+        }
     }
 }
 

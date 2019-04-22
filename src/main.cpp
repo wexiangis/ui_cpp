@@ -35,11 +35,19 @@ unsigned char* build_grid(int w, int h)
     return ret;
 }
 
-#define TEST_MODE 1
+#define TEST_MODE 2
 
-#if(TEST_MODE == 1)
+#if(TEST_MODE == 2)
 
-int clockS, clockE;
+//
+int main(int argc, char **argv)
+{
+    Polygon pg(4);
+
+    return 0;
+}
+
+#elif(TEST_MODE == 1)
 
 //
 int main(int argc, char **argv)
