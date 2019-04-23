@@ -18,6 +18,49 @@ int clock_count()
     return result;
 }
 
+#define TEST_MODE 2
+
+#if(TEST_MODE == 2)
+
+#include <stdlib.h>
+#include <string.h>
+
+//
+int main(int argc, char **argv)
+{
+    int rad = 20, w = VIEW_X_SIZE, h = VIEW_Y_SIZE, degree = 0, angle = 360-60, degree2;
+
+    int gridSize = w*h;
+    unsigned char *grid = new unsigned char[gridSize];
+
+    Polygon pg(0);
+
+    ViewPen pen(0);
+
+    while(1)
+    {
+        memset(grid, 0, gridSize);
+
+        degree2 = degree%360;
+        rad = 20;
+        for(int i = 0; i < 18; i++)
+        {
+            pg.get_grid(rad, rad-5-(i%2)*10, angle, degree2, grid, &w, &h, 0xFF);
+            rad += 20; degree2 += 60;
+        }
+        degree -= 30;
+
+        pen.clear(0);
+        pen.print_grid(grid, 0xFF0000, 0, 0, w, h, 0);
+        pen.output();
+        usleep(200000);
+    }
+
+    return 0;
+}
+
+#elif(TEST_MODE == 1)
+
 unsigned char* build_grid(int w, int h)
 {
     unsigned char *ret = new unsigned char[w*h];
@@ -34,58 +77,6 @@ unsigned char* build_grid(int w, int h)
 
     return ret;
 }
-
-#define TEST_MODE 2
-
-#if(TEST_MODE == 2)
-
-#include <stdlib.h>
-#include <string.h>
-
-//
-int main(int argc, char **argv)
-{
-    int rad = 20, w = VIEW_X_SIZE, h = VIEW_Y_SIZE, degree = 0, angle = 360-30, degree2;
-
-    int gridSize = w*h;
-    unsigned char *grid = new unsigned char[gridSize];
-
-    Polygon pg(0);
-
-    degree2 = degree%360;
-    rad = 20;
-    for(int i = 0; i < 20; i++)
-    {
-        pg.get_grid(rad, rad-10, angle, degree2, grid, &w, &h, 0xFF);
-        rad += 20; degree2 += 60;
-    }
-    degree -= 30;
-
-    ViewPen pen(0);
-
-    while(1)
-    {
-        pen.clear(0);
-        pen.print_grid(grid, 0xFF0000, 0, 0, w, h, 0);
-        pen.output();
-        usleep(200000);
-
-        memset(grid, 0, gridSize);
-
-        degree2 = degree%360;
-        rad = 20;
-        for(int i = 0; i < 20; i++)
-        {
-            pg.get_grid(rad, rad-10, angle, degree2, grid, &w, &h, 0xFF);
-            rad += 20; degree2 += 60;
-        }
-        degree -= 30;
-    }
-
-    return 0;
-}
-
-#elif(TEST_MODE == 1)
 
 //
 int main(int argc, char **argv)
