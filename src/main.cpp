@@ -45,7 +45,7 @@ int main(int argc, char **argv)
         rad = 20;
         for(int i = 0; i < 18; i++)
         {
-            pg.get_grid(rad, rad-5-(i%2)*10, angle, degree2, grid, &w, &h, 0xFF);
+            pg.get_circle(rad, rad-5-(i%2)*10, angle, degree2, grid, &w, &h, 0xFF);
             rad += 20; degree2 += 60;
         }
         degree -= 30;

@@ -1,5 +1,6 @@
 
 #include "viewShape.h"
+#include <iostream>
 #include <math.h>
 
 //递归填充
@@ -109,87 +110,7 @@ int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *
 
 const double VS_PI = 3.14159265358979323846;
 
-Polygon::Polygon(int line = 0)
-{
-    if(line < 1)//圆
-    {
-        LINE = 0;
-        DOT = 0;
-        return;
-    }
-    //
-    LINE = line;
-    DOT = new int[(LINE+1)*2];
-    //
-    if(LINE == 1)//直线
-    {
-        DOT[0] = -1;
-        DOT[1] = 0;
-        DOT[2] = 1;
-        DOT[3] = 0;
-    }
-    else if(LINE == 2)//折线
-    {
-        DOT[0] = -9;
-        DOT[1] = -5;
-        DOT[2] = 0;
-        DOT[3] = 10;
-        DOT[4] = 9;
-        DOT[5] = -5;
-    }
-    else//多边形
-    {
-        int radius = 100;
-        double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
-        //
-        if(LINE%2)//单数
-            degreeStart = VS_PI/2;
-        else//双数
-            degreeStart = VS_PI/2 - VS_PI*2/LINE/2;
-        //
-        for(int i = 0, j = 0; i < LINE; i++)
-        {
-            degreeCount = degreeStart - VS_PI*2*i/LINE;
-            //计算X,Y坐标
-            DOT[j] = round(radius*cos(degreeCount));
-            DOT[j+1] = round(radius*sin(degreeCount));
-            //
-            j += 2;
-        }
-    }
-}
-
-Polygon::Polygon(int line, int *xy)
-{
-    if(line < 0 || !xy)
-    {
-        LINE = 0;
-        return;
-    }
-    //
-    LINE = line;
-    //
-    if(LINE == 0)//圆
-        return;
-    //
-    DOT = new int[(LINE+1)*2];
-    //
-    for(int i = 0, j = 0; i < LINE; i++)
-    {
-        DOT[j] = xy[j];
-        j += 1;
-        DOT[j] = xy[j];
-        j += 1;
-    }
-}
-
-Polygon::~Polygon()
-{
-    if(DOT)
-        delete[] DOT;
-}
-
-unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight)
+unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight, int *xyMid = NULL)
 {
     int RAD = rad;
     //画圆相关
@@ -223,12 +144,17 @@ unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsig
             ySize = *gh;
             yMid = ySize/2;
         }
+        //
+        if(xyMid){
+            xMid = xyMid[0];
+            yMid = xyMid[1];
+        }
     }
     else
         mem = new unsigned char[xSize*ySize];
+    //
     memBUff = new unsigned char*[ySize];
-    for(int i = 0, j = 0; i < ySize; i++)
-    {
+    for(int i = 0, j = 0; i < ySize; i++){
         memBUff[i] = &mem[j];
         j += xSize;
     }
@@ -371,8 +297,7 @@ unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsig
                 //使用Bresenham算法画圆
                 if(circle_di < 0)
                     circle_di += 4*circle_a + 6;
-                else
-                {
+                else{
                     circle_di += 10 + 4*(circle_a - circle_b);
                     circle_b--;
                 }
@@ -384,6 +309,118 @@ unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsig
     if(gh) *gh = ySize;
     //
     delete[] memBUff;
+    //
+    return mem;
+}
+
+//-------------------- 接口封装 --------------------
+
+Polygon::Polygon(int line = 0)
+{
+    if(line < 1)//圆
+    {
+        LINE = 0;
+        DOT_LEN = 0;
+        DOT = 0;
+        return;
+    }
+    //
+    LINE = line;
+    DOT_LEN = (LINE+1)*2;
+    DOT = new int[DOT_LEN];
+    //
+    if(LINE == 1)//直线
+    {
+        DOT[0] = -1;
+        DOT[1] = 0;
+        DOT[2] = 1;
+        DOT[3] = 0;
+    }
+    else if(LINE == 2)//折线
+    {
+        DOT[0] = -9;
+        DOT[1] = -5;
+        DOT[2] = 0;
+        DOT[3] = 10;
+        DOT[4] = 9;
+        DOT[5] = -5;
+    }
+    else//多边形
+    {
+        int radius = 100;
+        double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
+        //
+        if(LINE%2)//单数
+            degreeStart = VS_PI/2;
+        else//双数
+            degreeStart = VS_PI/2 - VS_PI*2/LINE/2;
+        //
+        for(int i = 0, j = 0; i < LINE; i++)
+        {
+            degreeCount = degreeStart - VS_PI*2*i/LINE;
+            //计算X,Y坐标
+            DOT[j] = round(radius*cos(degreeCount));
+            DOT[j+1] = round(radius*sin(degreeCount));
+            //
+            j += 2;
+        }
+    }
+}
+
+Polygon::Polygon(int line, int *xy)
+{
+    if(line < 1 || !xy)//圆
+    {
+        LINE = 0;
+        DOT_LEN = 0;
+        DOT = 0;
+        return;
+    }
+    //
+    LINE = line;
+    DOT_LEN = (LINE+1)*2;
+    DOT = new int[DOT_LEN];
+    //
+    for(int i = 0, j = 0; i < LINE; i++)
+    {
+        DOT[j] = xy[j];
+        j += 1;
+        DOT[j] = xy[j];
+        j += 1;
+    }
+}
+
+Polygon::~Polygon()
+{
+    if(DOT)
+        delete[] DOT;
+}
+
+unsigned char* Polygon::get_circle(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight)
+{
+    return _circle(rad, rad2, angle, degree, grid, gw, gh, weight, NULL);
+}
+
+unsigned char* Polygon::get_grid(int w, int h, int lineSize, unsigned char weight)
+{
+    if(DOT_LEN == 0)
+        return NULL;
+    //
+    int memSize = w*h;
+    unsigned char *mem = new unsigned char[memSize];
+    unsigned char **memBUff = new unsigned char*[h];
+    int *dot = new int[DOT_LEN];
+    //grid初始化
+    for(int i = 0, j = 0; i < h; i++){
+        memBUff[i] = &mem[j];
+        j += w;
+    }
+    //缩放端点坐标
+    ;
+
+    //
+    delete[] memBUff;
+    delete[] dot;
     //
     return mem;
 }
