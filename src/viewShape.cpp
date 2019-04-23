@@ -253,7 +253,8 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
                             memBUff[yMid - sectorBuff[sectorCount-blockCount-1][1] + 1][xMid - (int)(sectorBuff[sectorCount-blockCount-1][0]*multi)] = weight;
                             break;
                     }
-                }else//缩放Y轴
+                }
+                else//缩放Y轴
                 {
                     switch(block)
                     {
@@ -337,7 +338,8 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
                     //8
                     memBUff[yMid - circle_b][xMid - (int)(circle_a*multi)] = weight;
                     memBUff[yMid - circle_b + 1][xMid - (int)(circle_a*multi)] = weight;
-                }else//缩放Y轴
+                }
+                else//缩放Y轴
                 {
                     //1
                     memBUff[yMid - (int)(circle_b*multi)][xMid + circle_a] = weight;
@@ -407,7 +409,8 @@ unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char *
         if(gw && (*gw < xSize || *gw < ySize)){
             RAD = (*gw/2)-1;
             circle_rad = RAD;
-        }else if(gh && (*gh < xSize || *gh < ySize)){
+        }
+        if(gh && (*gh < xSize || *gh < ySize)){
             RAD = (*gh/2)-1;
             circle_rad = RAD;
         }
