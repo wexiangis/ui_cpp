@@ -243,6 +243,8 @@ unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsig
         degreeStart = (degree%360) - (angle%360)/2;
         if(degreeStart < 0)
             degreeStart += 360;
+        else if(degreeStart >= 360)
+            degreeStart -= 360;
         degreeEnd = degreeStart + angle - 1;
         //
         for(;circle_rad > RAD - circle_size && circle_rad > 0; circle_rad--)
@@ -268,11 +270,20 @@ unsigned char* Polygon::get_grid(int rad, int rad2, int angle, int degree, unsig
                 }
             }
             //
-            double degreeDivOf45 = 45/(double)sectorCount, degreeCount;
-            int temp = round(degreeStart/degreeDivOf45);
-            int block = temp/sectorCount, blockCount = temp%sectorCount;
+            if(!sectorCount)
+                continue;
             //
-            for(degreeCount = temp*degreeDivOf45;
+            double degreeDivOf45 = 45/(double)sectorCount, degreeCount;
+            int temp, block, blockCount;//degreeStart 所在线(总共8*sectorCount / 所在块(总共8块 / 所在线计数
+            if(degreeStart < 0)
+                temp = round((360+degreeStart)/degreeDivOf45);
+            else
+                temp = round(degreeStart/degreeDivOf45);
+            block = temp/sectorCount;
+            blockCount = temp%sectorCount;
+            //
+            // for(degreeCount = temp*degreeDivOf45;
+            for(degreeCount = degreeStart;
                 degreeCount <= degreeEnd;
                 degreeCount+=degreeDivOf45)
             {

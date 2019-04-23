@@ -39,28 +39,48 @@ unsigned char* build_grid(int w, int h)
 
 #if(TEST_MODE == 2)
 
+#include <stdlib.h>
+#include <string.h>
+
 //
 int main(int argc, char **argv)
 {
-    int rad = 50, w = 300, h = 300;
+    int rad = 20, w = VIEW_X_SIZE, h = VIEW_Y_SIZE, degree = 0, angle = 360-30, degree2;
 
-    unsigned char *grid = new unsigned char[w*h];
+    int gridSize = w*h;
+    unsigned char *grid = new unsigned char[gridSize];
 
     Polygon pg(0);
 
-    pg.get_grid(rad, rad-10, 120, 0, grid, &w, &h, 0xFF);
-    rad += 20;
-    pg.get_grid(rad, rad-10, 120, 30, grid, &w, &h, 0xC0);
-    rad += 20;
-    pg.get_grid(rad, rad-10, 120, 60, grid, &w, &h, 0x80);
-    rad += 20;
-    pg.get_grid(rad, rad-10, 120, 90, grid, &w, &h, 0x40);
+    degree2 = degree%360;
+    rad = 20;
+    for(int i = 0; i < 20; i++)
+    {
+        pg.get_grid(rad, rad-10, angle, degree2, grid, &w, &h, 0xFF);
+        rad += 20; degree2 += 60;
+    }
+    degree -= 30;
 
     ViewPen pen(0);
-    pen.clear(0);
 
-    pen.print_grid(grid, 0xFF0000, 100, 100, w, h, 0);
-    pen.output();
+    while(1)
+    {
+        pen.clear(0);
+        pen.print_grid(grid, 0xFF0000, 0, 0, w, h, 0);
+        pen.output();
+        usleep(200000);
+
+        memset(grid, 0, gridSize);
+
+        degree2 = degree%360;
+        rad = 20;
+        for(int i = 0; i < 20; i++)
+        {
+            pg.get_grid(rad, rad-10, angle, degree2, grid, &w, &h, 0xFF);
+            rad += 20; degree2 += 60;
+        }
+        degree -= 30;
+    }
 
     return 0;
 }
