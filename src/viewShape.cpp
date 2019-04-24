@@ -553,6 +553,48 @@ int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *
     return distance + 2;
 }
 
+//递归填充 注意: xMax, yMax 是x,y可以到达的最大值
+inline void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, char dir)
+{
+    if(map[y][x] == 0)
+        return;
+    map[y][x] = 0;
+    //
+    switch(dir)
+    {
+        case 0:
+            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
+            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
+            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
+            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
+            break;
+        case 'u':
+            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
+            // if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
+            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
+            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
+            break;
+        case 'd':
+            // if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
+            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
+            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
+            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
+            break;
+        case 'l':
+            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
+            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
+            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
+            // if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
+            break;
+        case 'r':
+            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
+            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
+            // if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
+            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
+            break;
+    }
+}
+
 //-------------------- 接口封装 --------------------
 
 Polygon::Polygon(int line = 0)
