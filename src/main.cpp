@@ -7,20 +7,50 @@
 #include "viewShape.h"
 #include <iostream>
 
-int clock_count()
+int clock_count(int tag)
 {
     static int last = 0, th = 0;
     int current = clock();
     int result = current-last;
-    std::cout<<"clock "<<th<<" : "<<result<<std::endl;
+    std::cout<<'['<<tag<<"] clock "<<th<<" : "<<result<<std::endl;
     last = current;
     th += 1;
     return result;
 }
 
-#define TEST_MODE 2
+#define TEST_MODE 3
 
-#if(TEST_MODE == 2)
+#if(TEST_MODE == 3)
+
+#include <stdlib.h>
+#include <string.h>
+
+//
+int main(int argc, char **argv)
+{
+    int w = VIEW_X_SIZE, h = VIEW_Y_SIZE;
+    // int w = 50, h = 50;
+
+    Polygon pg( 9 );
+    // Polygon pg( 4 , new int[8] {1,20, 30,4, 5,60, 70,8} );
+
+    ViewPen pen(0);
+
+    clock_count(0);
+
+    clock_count(1);
+    unsigned char *grid = pg.get_polygon(w, h, 100, 0xFF);
+    clock_count(2);
+
+    pen.clear(0);
+    pen.print_grid(grid, 0xFF0000, 0, 0, w, h, 0);
+    pen.output();
+    usleep(200000);
+
+    return 0;
+}
+
+#elif(TEST_MODE == 2)
 
 #include <stdlib.h>
 #include <string.h>
@@ -45,11 +75,11 @@ int main(int argc, char **argv)
         rad = 20;
         for(int i = 0; i < 18; i++)
         {
-            // pg.get_circle(rad, rad-5-(i%2)*10, angle, degree2, grid, &w, &h, 0xFF);
+            // pg.get_circle(rad, rad-5-(i%2)*10, angle, degree2, 0xFF, grid, &w, &h, NULL);
             if(i%2)
-                pg.get_ellipse(rad, rad/3, 10, angle, degree2, grid, &w, &h, 0xFF);
+                pg.get_ellipse(rad, rad/2, 10, angle, degree2, 0xFF, grid, &w, &h, NULL);
             else
-                pg.get_ellipse(rad/3, rad, 10, angle, degree2, grid, &w, &h, 0xFF);
+                pg.get_ellipse(rad, rad/2, 10, angle, degree2, 0xFF, grid, &w, &h, NULL);
             rad += 20; degree2 += 60;
         }
         degree -= 30;

@@ -2,115 +2,13 @@
 #include "viewShape.h"
 #include <iostream>
 #include <math.h>
-
-//递归填充
-inline void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, char dir)
-{
-    if(map[y][x])
-        return;
-    map[y][x] = 0xFF;
-    //
-    switch(dir)
-    {
-        case 'u':
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            // if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'd':
-            // if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'l':
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            // if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'r':
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            // if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 0:
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-    }
-}
-
-//功能: 指定起止坐标, 返回两点间画线的Y坐标数组
-//参数: xStart, yStart, xEnd, yEnd : 起止坐标
-//    dotX, dotY : Y坐标数组起始地址, 需要自己先分配好内存再传入
-//返回: 点数
-int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *dotY)
-{
-	unsigned short t; 
-	int xerr = 0, yerr = 0;
-	int delta_x, delta_y;
-	int distance; 
-	int incx, incy, xCount, yCount; 
-	//
-	delta_x = xEnd - xStart; //计算坐标增量 
-	delta_y = yEnd - yStart; 
-	xCount = xStart; 
-	yCount = yStart; 
-	//
-	if(delta_x > 0)
-	    incx = 1; //设置单步方向 
-	else if(delta_x == 0)
-	    incx = 0;//垂直线 
-	else 
-	{
-	    incx = -1;
-	    delta_x = -delta_x;
-	} 
-	//
-	if(delta_y > 0)
-	    incy = 1; 
-	else if(delta_y == 0)
-	    incy = 0;//水平线 
-	else
-	{
-	    incy = -1;
-	    delta_y = -delta_y;
-	} 
-	//
-	if(delta_x > delta_y)
-	    distance = delta_x; //选取基本增量坐标轴 
-	else 
-	    distance = delta_y; 
-	//
-	for(t = 0; t <= distance + 1; t++)//画线输出 
-	{
-        *dotX++ = xCount;
-        *dotY++ = yCount;
-        
-		xerr += delta_x ; 
-		yerr += delta_y ; 
-		if(xerr > distance) 
-		{ 
-			xerr -= distance; 
-			xCount += incx; 
-		} 
-		if(yerr > distance) 
-		{ 
-			yerr -= distance; 
-			yCount += incy; 
-		} 
-	}
-    return distance + 2;
-}
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 const double VS_PI = 3.14159265358979323846;
 
-unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight, int *xyMid = NULL)
+unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree, unsigned char weight, unsigned char *grid, int *gw, int *gh, int *xyCentre = NULL)
 {
     int RAD = radX > radY ? radX : radY;
     char mode = radX > radY ? 0 : 1;
@@ -148,9 +46,9 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
             yMid = ySize/2;
         }
         //
-        if(xyMid){
-            xMid = xyMid[0];
-            yMid = xyMid[1];
+        if(xyCentre){
+            xMid = xyCentre[0];
+            yMid = xyCentre[1];
         }
     }
     else
@@ -388,7 +286,7 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
     return mem;
 }
 
-unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight, int *xyMid = NULL)
+unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char weight, unsigned char *grid, int *gw, int *gh, int *xyCentre = NULL)
 {
     int RAD = rad;
     //画圆相关
@@ -424,9 +322,9 @@ unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char *
             yMid = ySize/2;
         }
         //
-        if(xyMid){
-            xMid = xyMid[0];
-            yMid = xyMid[1];
+        if(xyCentre){
+            xMid = xyCentre[0];
+            yMid = xyCentre[1];
         }
     }
     else
@@ -592,11 +490,74 @@ unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char *
     return mem;
 }
 
+//功能: 指定起止坐标, 返回两点间画线的Y坐标数组
+//参数: xStart, yStart, xEnd, yEnd : 起止坐标
+//    dotX, dotY : Y坐标数组起始地址, 需要自己先分配好内存再传入
+//返回: 点数
+int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *dotY)
+{
+	unsigned short t; 
+	int xerr = 0, yerr = 0;
+	int delta_x, delta_y;
+	int distance; 
+	int incx, incy, xCount, yCount; 
+	//
+	delta_x = xEnd - xStart; //计算坐标增量 
+	delta_y = yEnd - yStart; 
+	xCount = xStart; 
+	yCount = yStart; 
+	//
+	if(delta_x > 0)
+	    incx = 1; //设置单步方向 
+	else if(delta_x == 0)
+	    incx = 0;//垂直线 
+	else 
+	{
+	    incx = -1;
+	    delta_x = -delta_x;
+	} 
+	//
+	if(delta_y > 0)
+	    incy = 1; 
+	else if(delta_y == 0)
+	    incy = 0;//水平线 
+	else
+	{
+	    incy = -1;
+	    delta_y = -delta_y;
+	} 
+	//
+	if(delta_x > delta_y)
+	    distance = delta_x; //选取基本增量坐标轴 
+	else 
+	    distance = delta_y; 
+	//
+	for(t = 0; t <= distance + 1; t++)//画线输出 
+	{
+        *dotX++ = xCount;
+        *dotY++ = yCount;
+        
+		xerr += delta_x ; 
+		yerr += delta_y ; 
+		if(xerr > distance) 
+		{ 
+			xerr -= distance; 
+			xCount += incx; 
+		} 
+		if(yerr > distance) 
+		{ 
+			yerr -= distance; 
+			yCount += incy; 
+		} 
+	}
+    return distance + 2;
+}
+
 //-------------------- 接口封装 --------------------
 
 Polygon::Polygon(int line = 0)
 {
-    if(line < 1)//圆
+    if(line < 3)//圆
     {
         LINE = 0;
         DOT_LEN = 0;
@@ -607,71 +568,72 @@ Polygon::Polygon(int line = 0)
     }
     //
     LINE = line;
-    DOT_LEN = (LINE+1)*2;
+    DOT_LEN = LINE*2;
     DOT = new int[DOT_LEN];
+    //多边形
+    int radius = 100;
+    double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
+    int maxX = 0, maxY = 0, minX = 0, minY = 0;
     //
-    if(LINE == 1)//直线
+    if(LINE%2)//单数
+        degreeStart = VS_PI/2;
+    else//双数
+        degreeStart = VS_PI/2 - VS_PI*2/LINE/2;
+    //
+    int i, j, cc, half = LINE/2 + LINE%2;
+    //计算右半边
+    for(i = cc = 0; cc < half; cc++)
     {
-        DOT[0] = -1;
-        DOT[1] = 0;
-        DOT[2] = 1;
-        DOT[3] = 0;
-        WIDTH = 3;
-        HEIGHT = 1;
-    }
-    else if(LINE == 2)//折线
-    {
-        DOT[0] = -9;
-        DOT[1] = -5;
-        DOT[2] = 0;
-        DOT[3] = 10;
-        DOT[4] = 9;
-        DOT[5] = -5;
-        WIDTH = 9+9+1;
-        HEIGHT = 5+10+1;
-    }
-    else//多边形
-    {
-        int radius = 100;
-        double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
-        int maxX = 0, maxY = 0, minX = 0, minY = 0;
+        degreeCount = degreeStart - VS_PI*2*cc/LINE;
+        //计算X,Y坐标
+        DOT[i] = abs(round(radius*cos(degreeCount)));
         //
-        if(LINE%2)//单数
-            degreeStart = VS_PI/2;
-        else//双数
-            degreeStart = VS_PI/2 - VS_PI*2/LINE/2;
-        //
-        for(int i = 0, j = 0; i < LINE; i++)
-        {
-            degreeCount = degreeStart - VS_PI*2*i/LINE;
-            //计算X,Y坐标
-            DOT[j] = round(radius*cos(degreeCount));
-            //
-            if(DOT[j] < minX)
-                minX = DOT[j];
-            else if(DOT[j] > maxX)
-                maxX = DOT[j];
-            //
-            j += 1;
-            //
-            DOT[j] = round(radius*sin(degreeCount));
-            //
-            if(DOT[j] < minY)
-                minY = DOT[j];
-            else if(DOT[j] > maxY)
-                maxY = DOT[j];
-            //
-            j += 1;
+        if(DOT[i] > maxX){
+            maxX = DOT[i];
+            minX = -maxX;
         }
         //
-        WIDTH = minX + maxX + 1;
-        HEIGHT = minY + maxY + 1;
+        i += 1;
+        //
+        DOT[i] = round(radius*sin(degreeCount));
+        //
+        if(DOT[i] < minY)
+            minY = DOT[i];
+        else if(DOT[i] > maxY)
+            maxY = DOT[i];
+        //
+        i += 1;
+        //根据象限修正符号
+        // printf("R: X/%d, Y/%d\n", DOT[i-2], DOT[i-1]);
     }
+    //轴对称
+    for(j = i; cc < LINE; cc++)
+    {
+        DOT[i++] = -DOT[j-2];
+        DOT[i++] = DOT[j-1];
+        j -= 2;
+        // printf("L: X/%d, Y/%d\n", DOT[i-2], DOT[i-1]);
+    }
+    //坐标归正
+    for(int i = 0; i < DOT_LEN;)
+    {
+        DOT[i] -= minX;//x坐标右推至正值范围
+        i++;
+        DOT[i] = -(DOT[i] - maxY);//y坐标上推至正值范围 然后大小翻转
+        i++;
+        // printf("X/%d, Y/%d\n", DOT[i-2], DOT[i-1]);
+    }
+    //
+    WIDTH = maxX - minX + 1;
+    HEIGHT = maxY - minY + 1;
+    //
+    // printf("init: line/%d, width/%d, height/%d, dot_len/%d [%d-%d %d-%d]\n", 
+    //     LINE, WIDTH, HEIGHT, DOT_LEN, minX, maxX, minY, maxY);
 }
 
 Polygon::Polygon(int line, int *xy)
 {
-    if(line < 1 || !xy)//圆
+    if(line < 3 || !xy)//圆
     {
         LINE = 0;
         DOT_LEN = 0;
@@ -682,34 +644,60 @@ Polygon::Polygon(int line, int *xy)
     }
     //
     LINE = line;
-    DOT_LEN = (LINE+1)*2;
+    DOT_LEN = LINE*2;
     DOT = new int[DOT_LEN];
     //
-    int maxX = 0, maxY = 0, minX = 0, minY = 0;
+    int maxX = xy[0], maxY = xy[1], minX = xy[0], minY = xy[1];
     //
-    for(int i = 0, j = 0; i < LINE; i++)
+    for(int i = 0; i < DOT_LEN;)
     {
-        DOT[j] = xy[j];
+        DOT[i] = xy[i];
         //
-        if(DOT[j] < minX)
-            minX = DOT[j];
-        else if(DOT[j] > maxX)
-            maxX = DOT[j];
+        if(DOT[i] < minX)
+            minX = DOT[i];
+        else if(DOT[i] > maxX)
+            maxX = DOT[i];
         //
-        j += 1;
+        i += 1;
         //
-        DOT[j] = xy[j];
+        DOT[i] = xy[i];
         //
-        if(DOT[j] < minY)
-            minY = DOT[j];
-        else if(DOT[j] > maxY)
-            maxY = DOT[j];
+        if(DOT[i] < minY)
+            minY = DOT[i];
+        else if(DOT[i] > maxY)
+            maxY = DOT[i];
         //
-        j += 1;
+        i += 1;
+        // printf("A: X/%d, Y/%d\n", DOT[i-2], DOT[i-1]);
+    }
+    //多余裁掉
+    if(minX > 0){
+        for(int i = 0; i < DOT_LEN; i+=2)
+            DOT[i] -= minX;
+        maxX -= minX;
+        minX = 0;
+    }
+    if(minY > 0){
+        for(int i = 1; i < DOT_LEN; i+=2)
+            DOT[i] -= minY;
+        maxY -= minY;
+        minY = 0;
+    }
+    //坐标归正
+    for(int i = 0; i < DOT_LEN;)
+    {
+        // DOT[i] = -(DOT[i] - maxX);
+        i++;
+        DOT[i] = -(DOT[i] - maxY);//大小翻转
+        i++;
+        // printf("X/%d, Y/%d\n", DOT[i-2], DOT[i-1]);
     }
     //
-    WIDTH = minX + maxX + 1;
-    HEIGHT = minY + maxY + 1;
+    WIDTH = maxX - minX + 1;
+    HEIGHT = maxY - minY + 1;
+    //
+    // printf("init: line/%d, width/%d, height/%d, dot_len/%d [%d-%d %d-%d]\n", 
+    //     LINE, WIDTH, HEIGHT, DOT_LEN, minX, maxX, minY, maxY);
 }
 
 Polygon::~Polygon()
@@ -718,32 +706,129 @@ Polygon::~Polygon()
         delete[] DOT;
 }
 
-unsigned char* Polygon::get_circle(int rad, int rad2, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight)
+unsigned char* Polygon::get_circle(int rad, int rad2, int angle, int degree, unsigned char weight, unsigned char *grid, int *gw, int *gh, int *xyCentre = NULL)
 {
-    return _circle(rad, rad2, angle, degree, grid, gw, gh, weight, NULL);
+    return _circle(rad, rad2, angle, degree, weight, grid, gw, gh, xyCentre);
 }
 
-unsigned char* Polygon::get_ellipse(int radX, int radY, int lineSize, int angle, int degree, unsigned char *grid, int *gw, int *gh, unsigned char weight)
+unsigned char* Polygon::get_ellipse(int radX, int radY, int lineSize, int angle, int degree, unsigned char weight, unsigned char *grid, int *gw, int *gh, int *xyCentre = NULL)
 {
-    return _ellipse(radX, radY, lineSize, angle, degree, grid, gw, gh, weight, NULL);
+    return _ellipse(radX, radY, lineSize, angle, degree, weight, grid, gw, gh, xyCentre);
 }
 
-unsigned char* Polygon::get_grid(int w, int h, int lineSize, unsigned char weight)
+unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char weight)
 {
-    if(DOT_LEN == 0)
+    if(DOT_LEN == 0 || w < 1 || h < 1)
         return NULL;
     //
-    int memSize = w*h;
-    unsigned char *mem = new unsigned char[memSize];
-    unsigned char **memBUff = new unsigned char*[h];
-    int *dot = new int[DOT_LEN];
+    int W = w, H = h;
+    int memSize = W*H;
+    unsigned char *mem = NULL;
+    unsigned char **memBUff = NULL;
+    int *dot = NULL, *dotP;
+    //
+    if(lineSize > W || lineSize > H)
+        return NULL;
     //grid初始化
-    for(int i = 0, j = 0; i < h; i++){
+    mem = new unsigned char[memSize];
+    memBUff = new unsigned char*[H];
+    for(int i = 0, j = 0; i < H; i++){
         memBUff[i] = &mem[j];
-        j += w;
+        j += W;
     }
-    //缩放端点坐标
-    ;
+    dot = new int[DOT_LEN];
+    //----- 画线 -----
+    if(lineSize > 0)
+    {
+        //缩放端点坐标
+        double zoomX = (double)(W-lineSize*2)/WIDTH;
+        double zoomY = (double)(H-lineSize*2)/HEIGHT;
+        for(int i = 0, HW = WIDTH/2, HH = HEIGHT/2; i < DOT_LEN;){
+            if(DOT[i] > HW)
+                dot[i] = W - 1 - (WIDTH-DOT[i]-1)*zoomX - lineSize;//过半部分 缩放
+            else
+                dot[i] = DOT[i]*zoomX + lineSize;//未过半部分 缩放
+            i += 1;
+            if(DOT[i] > HH)
+                dot[i] = H - 1 - (HEIGHT-DOT[i]-1)*zoomY - lineSize;//过半部分 缩放
+            else
+                dot[i] = DOT[i]*zoomY + lineSize;//未过半部分 缩放
+            i += 1;
+            // printf("w/%d/%.2lf, h/%d/%.2lf  x/%d, y/%d\n", W, zoomX, H, zoomY, dot[i-2], dot[i-1]);
+        }
+        //在栅格图上连线
+        int xLoad[W+H+1], yLoad[W+H+1], loadCount;
+        dotP = &dot[DOT_LEN-2];
+        for(int i = 0; i < DOT_LEN; i+=2){
+            //获取直线坐标
+            loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
+            dotP = &dot[i];
+            //画点
+            for(int j = 0; j < loadCount; j++)
+                memBUff[yLoad[j]][xLoad[j]] = weight;
+        }
+    }
+    //----- 填充 -----
+    else
+    {
+        memset(mem, weight, memSize);
+        //缩放端点坐标
+        double zoomX = (double)W/WIDTH;
+        double zoomY = (double)H/HEIGHT;
+        for(int i = 0, HW = WIDTH/2, HH = HEIGHT/2; i < DOT_LEN;){
+            if(DOT[i] > HW)
+                dot[i] = W - 1 - (WIDTH-DOT[i]-1)*zoomX;//过半部分 缩放
+            else
+                dot[i] = DOT[i]*zoomX;//未过半部分 缩放
+            i += 1;
+            if(DOT[i] > HH)
+                dot[i] = H - 1 - (HEIGHT-DOT[i]-1)*zoomY;//过半部分 缩放
+            else
+                dot[i] = DOT[i]*zoomY;//未过半部分 缩放
+            i += 1;
+            // printf("w/%d/%.2lf, h/%d/%.2lf  x/%d, y/%d\n", W, zoomX, H, zoomY, dot[i-2], dot[i-1]);
+        }
+        //在栅格图上连线
+        int xLoad[W+H+1], yLoad[W+H+1], loadCount;
+        dotP = &dot[DOT_LEN-2];
+        for(int i = 0; i < DOT_LEN; i+=2){
+            //获取直线坐标
+            loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
+            dotP = &dot[i];
+            //画点
+            for(int j = 0; j < loadCount; j++)
+                memBUff[yLoad[j]][xLoad[j]] = weight-1;
+        }
+        //填充
+        for(int i = 0, j; i < H; i++){
+            for(j = 0; j < W; j++){
+                if(memBUff[i][j] == weight)
+                    memBUff[i][j] = 0;
+                else
+                    break;
+            }
+            for(j = W-1; j >= 0; j--){
+                if(memBUff[i][j] == weight)
+                    memBUff[i][j] = 0;
+                else
+                    break;
+            }
+        }
+        for(int i = 0, j; i < W; i++){
+            for(j = 0; j < H; j++){
+                if(memBUff[j][i] == weight)
+                    memBUff[j][i] = 0;
+                else
+                    break;
+            }
+            for(j = H-1; j >= 0; j--){
+                if(memBUff[j][i] == weight)
+                    memBUff[j][i] = 0;
+                else
+                    break;
+            }
+        }
+    }
 
     //
     delete[] memBUff;
