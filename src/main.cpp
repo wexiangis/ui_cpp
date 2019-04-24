@@ -28,18 +28,19 @@ int clock_count(int tag)
 //
 int main(int argc, char **argv)
 {
-    int w = VIEW_X_SIZE, h = VIEW_Y_SIZE;
-    // int w = 50, h = 50;
+    int w = VIEW_X_SIZE/2, h = VIEW_Y_SIZE/2;
+    // int w = 100, h = 100;
 
-    Polygon pg( 9 );
-    // Polygon pg( 4 , new int[8] {1,20, 30,4, 5,60, 70,8} );
+    // Polygon pg( 3 );
+    Polygon pg( 20 , new int[20*2] {-2,3, 2,3, 1,5, 5,5, 5,1, 3,2, 3,-2, 5,-1, 5,-5, 1,-5, 2,-3, -2,-3, -1,-5, -5,-5, -5,-1, -3,-2, -3,2, -5,1, -5,5, -1,5} );
 
     ViewPen pen(0);
 
     clock_count(0);
 
     clock_count(1);
-    unsigned char *grid = pg.get_polygon(w, h, 100, 0xFF);
+    // unsigned char *grid = pg.get_polygon(w, h, 0, 0xFF);
+    unsigned char *grid = pg.get_polygon2(w, h, 0xFF);
     clock_count(2);
 
     pen.clear(0);

@@ -554,45 +554,59 @@ int _getDotFromLine(int xStart, int yStart, int xEnd, int yEnd, int *dotX, int *
 }
 
 //递归填充 注意: xMax, yMax 是x,y可以到达的最大值
-inline void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, char dir)
+inline void _recursion_u(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag);
+inline void _recursion_d(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag);
+inline void _recursion_l(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag);
+inline void _recursion_r(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag);
+inline void _recursion_u(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag)
 {
-    if(map[y][x] == 0)
+    if(map[y][x] != tag)
         return;
     map[y][x] = 0;
-    //
-    switch(dir)
-    {
-        case 0:
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'u':
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            // if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'd':
-            // if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'l':
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            // if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-        case 'r':
-            if(y > 0) recursion(map, x, y-1, xMax, yMax, 'u');
-            if(y < yMax) recursion(map, x, y+1, xMax, yMax, 'd');
-            // if(x > 0) recursion(map, x-1, y, xMax, yMax, 'l');
-            if(x < xMax) recursion(map, x+1, y, xMax, yMax, 'r');
-            break;
-    }
+    if(y > 0) _recursion_u(map, x, y-1, xMax, yMax, tag);
+    // if(y < yMax) _recursion_d(map, x, y+1, xMax, yMax, tag);
+    if(x > 0) _recursion_l(map, x-1, y, xMax, yMax, tag);
+    if(x < xMax) _recursion_r(map, x+1, y, xMax, yMax, tag);
+}
+inline void _recursion_d(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag)
+{
+    if(map[y][x] != tag)
+        return;
+    map[y][x] = 0;
+    // if(y > 0) _recursion_u(map, x, y-1, xMax, yMax, tag);
+    if(y < yMax) _recursion_d(map, x, y+1, xMax, yMax, tag);
+    if(x > 0) _recursion_l(map, x-1, y, xMax, yMax, tag);
+    if(x < xMax) _recursion_r(map, x+1, y, xMax, yMax, tag);
+}
+inline void _recursion_l(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag)
+{
+    if(map[y][x] != tag)
+        return;
+    map[y][x] = 0;
+    if(y > 0) _recursion_u(map, x, y-1, xMax, yMax, tag);
+    if(y < yMax) _recursion_d(map, x, y+1, xMax, yMax, tag);
+    if(x > 0) _recursion_l(map, x-1, y, xMax, yMax, tag);
+    // if(x < xMax) _recursion_r(map, x+1, y, xMax, yMax, tag);
+}
+inline void _recursion_r(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag)
+{
+    if(map[y][x] != tag)
+        return;
+    map[y][x] = 0;
+    if(y > 0) _recursion_u(map, x, y-1, xMax, yMax, tag);
+    if(y < yMax) _recursion_d(map, x, y+1, xMax, yMax, tag);
+    // if(x > 0) _recursion_l(map, x-1, y, xMax, yMax, tag);
+    if(x < xMax) _recursion_r(map, x+1, y, xMax, yMax, tag);
+}
+void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned char tag)
+{
+    if(map[y][x] != tag)
+        return;
+    map[y][x] = 0;
+    if(y > 0) _recursion_u(map, x, y-1, xMax, yMax, tag);
+    if(y < yMax) _recursion_d(map, x, y+1, xMax, yMax, tag);
+    if(x > 0) _recursion_l(map, x-1, y, xMax, yMax, tag);
+    if(x < xMax) _recursion_r(map, x+1, y, xMax, yMax, tag);
 }
 
 //-------------------- 接口封装 --------------------
@@ -728,7 +742,7 @@ Polygon::Polygon(int line, int *xy)
     //坐标归正
     for(int i = 0; i < DOT_LEN;)
     {
-        // DOT[i] = -(DOT[i] - maxX);
+        DOT[i] -= minX;//x坐标右推至正值范围
         i++;
         DOT[i] = -(DOT[i] - maxY);//大小翻转
         i++;
@@ -878,3 +892,130 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
     //
     return mem;
 }
+
+void _recursion_part(unsigned char **memBUff, int w, int h, int divH, unsigned char weight)
+{
+    unsigned char **mp;
+    int cY, cX, check = 1;
+    int temp;
+    //
+    recursion(memBUff, 0, 0, w, divH-1, weight);
+    while(check)
+    {
+        //由上至下
+        for(cY = divH, check = 0; cY < h; cY+= divH)
+        {
+            mp = memBUff+cY;
+            //
+            if(cY + divH < h)
+                temp = divH - 1;
+            else
+                temp = h - cY - 1;
+            //
+            for(cX = 0; cX < w; cX++)
+            {
+                if(memBUff[cY][cX] == weight && memBUff[cY-1][cX] == 0)
+                    recursion(mp, cX, 0, w-1, temp, weight);
+                else if(memBUff[cY][cX] == 0 && memBUff[cY-1][cX] == weight)
+                    check += 1;
+            }
+        }
+        //由下至上
+        if(check)
+        {
+            for(cY = cY - divH, check = 0; cY > 0; cY-=divH)
+            {
+                if(cY == divH)
+                    temp = 0;
+                else
+                    temp = divH;
+                //
+                mp = memBUff+cY-temp;
+                //
+                for(cX = 0; cX < w; cX++)
+                {
+                    if(memBUff[cY][cX] == 0 && memBUff[cY-1][cX] == weight)
+                        recursion(mp, cX, temp-1, w-1, divH, weight);
+                    else if(memBUff[cY][cX] == weight && memBUff[cY-1][cX] == 0)
+                        check += 1;
+                }
+            }
+        }
+    }
+}
+
+unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
+{
+    if(DOT_LEN == 0 || w < 1 || h < 1)
+        return NULL;
+    //
+    int W = w, H = h;
+    int memSize = W*H;
+    unsigned char *mem = NULL;
+    unsigned char **memBUff = NULL;
+    int *dot = NULL, *dotP;
+    //grid初始化
+    memBUff = new unsigned char*[H+2];
+    for(int i = 0; i < H+2; i++){
+        memBUff[i] = new unsigned char[W+2];
+        memset(memBUff[i], weight, W+2);
+    }
+    //
+    dot = new int[DOT_LEN];
+    //缩放端点坐标
+    double zoomX = (double)W/WIDTH;
+    double zoomY = (double)H/HEIGHT;
+    for(int i = 0, HW = WIDTH/2, HH = HEIGHT/2; i < DOT_LEN;){
+        if(DOT[i] > HW)
+            dot[i] = W - (WIDTH-DOT[i]-1)*zoomX;//过半部分 缩放
+        else
+            dot[i] = DOT[i]*zoomX + 1;//未过半部分 缩放
+        i += 1;
+        if(DOT[i] > HH)
+            dot[i] = H - (HEIGHT-DOT[i]-1)*zoomY;//过半部分 缩放
+        else
+            dot[i] = DOT[i]*zoomY + 1;//未过半部分 缩放
+        i += 1;
+        // printf("w/%d/%.2lf, h/%d/%.2lf  x/%d, y/%d\n", W, zoomX, H, zoomY, dot[i-2], dot[i-1]);
+    }
+    //在栅格图上连线
+    int xLoad[W+H+1], yLoad[W+H+1], loadCount;
+    dotP = &dot[DOT_LEN-2];
+    for(int i = 0; i < DOT_LEN; i+=2){
+        //获取直线坐标
+        loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
+        dotP = &dot[i];
+        //画点
+        for(int j = 0; j < loadCount; j++)
+            memBUff[yLoad[j]][xLoad[j]] = weight-1;
+    }
+    //
+#define recursion_max 20000
+    //分块递归填充
+    if(memSize > recursion_max)
+    {
+        if(recursion_max > W+2)
+            _recursion_part(memBUff, W+2, H+2, recursion_max/(W+2), weight);
+        else
+            _recursion_part(memBUff, W+2, H+2, 1, weight);
+    }
+    //递归填充
+    else
+        recursion(memBUff, 0, 0, W+1, H+1, weight);
+    //
+    mem = new unsigned char[W*H];
+    int ccp = 0;
+    delete[] memBUff[ccp++];
+    for(int i = 0; i < memSize;){
+        memcpy(&mem[i], memBUff[ccp], W);
+        delete[] memBUff[ccp++];
+        i += W;
+    }
+    delete[] memBUff[ccp];
+    //
+    delete[] memBUff;
+    delete[] dot;
+    //
+    return mem;
+}
+
