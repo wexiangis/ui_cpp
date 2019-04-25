@@ -1071,12 +1071,17 @@ unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned c
     int W = w, H = h;
     int memSize = W*H;
     int RAD = rad>0?rad:0;
-    unsigned char *mem = new unsigned char[memSize], *pm;
+    unsigned char *mem = NULL, *pm;
     unsigned char *circleMem = NULL;
-    int rxL = RAD, ryL = RAD;
     //
+    if(w < 0 || h < 0)
+        return NULL;
+    //
+    mem = new unsigned char[memSize];
     if(RAD > 0)
         circleMem = _circle(RAD, RAD-lineSize, 0, 0, weight, NULL, NULL, NULL, NULL);
+    //
+    int rxL = RAD, ryL = RAD;
     //
     if(lineSize > 0)
     {
