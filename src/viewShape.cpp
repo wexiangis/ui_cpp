@@ -945,6 +945,13 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
     return mem;
 }
 
+unsigned char* Polygon::get_polygon_origin(int &w, int &h, int lineSize, unsigned char weight)
+{
+    w = WIDTH;
+    h = HEIGHT;
+    return Polygon::get_polygon(WIDTH, HEIGHT, lineSize, weight);
+}
+
 void _recursion_part(unsigned char **memBUff, int w, int h, int divH, unsigned char weight)
 {
     unsigned char **mp;
@@ -997,9 +1004,7 @@ void _recursion_part(unsigned char **memBUff, int w, int h, int divH, unsigned c
                 }
             }
         }
-
-        printf("recursion check: %d\n", check);
-
+        // printf("recursion check: %d\n", check);
     }while(check);
 }
 
@@ -1071,6 +1076,13 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     delete[] dot;
     //
     return mem;
+}
+
+unsigned char* Polygon::get_polygon2_origin(int &w, int &h, unsigned char weight)
+{
+    w = WIDTH;
+    h = HEIGHT;
+    return Polygon::get_polygon2(WIDTH, HEIGHT, weight);
 }
 
 unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned char weight)

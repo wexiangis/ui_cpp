@@ -20,8 +20,10 @@ public:
     unsigned char* get_ellipse(int radX, int radY, int lineSize, int angle, int degree, unsigned char weight, unsigned char *grid, int *gw, int *gh, int *xyCentre);
     //获取直线,折线,多边形
     unsigned char* get_polygon(int w, int h, int lineSize, unsigned char weight);
+    unsigned char* get_polygon_origin(int &w, int &h, int lineSize, unsigned char weight);
     //复杂多边形的填充
     unsigned char* get_polygon2(int w, int h, unsigned char weight);
+    unsigned char* get_polygon2_origin(int &w, int &h, unsigned char weight);
     //
     unsigned char* get_rect(int w, int h, int rad, int lineSize, unsigned char weight);
 
