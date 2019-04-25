@@ -864,7 +864,8 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
                     //
                     if(hit){
                         pc = &circleMem[ccHS*cW + ccWS];
-                        pm = &mem[(yLoad[j]+cmYErr)*W + (xLoad[j]+cmXErr)];
+                        pm = &memBUff[yLoad[j]+cmYErr][xLoad[j]+cmXErr];
+                        //
                         for(int k = 0; k < ccHL; k++){
                             for(int l = 0; l < ccWL; l++)
                                 pm[l] |= pc[l];
@@ -937,7 +938,6 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
             }
         }
     }
-
     //
     delete[] memBUff;
     delete[] dot;
@@ -1065,4 +1065,33 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     //
     return mem;
 }
+
+unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned char weight)
+{
+    int W = w, H = h;
+    int memSize = W*H;
+    int RAD = rad>0?rad:0;
+    unsigned char *mem = new unsigned char[memSize], *pm;
+    unsigned char *circleMem = NULL;
+    int rxL = RAD, ryL = RAD;
+    //
+    if(RAD > 0)
+        circleMem = _circle(RAD, RAD-lineSize, 0, 0, weight, NULL, NULL, NULL, NULL);
+    //
+    if(lineSize > 0)
+    {
+        ;
+    }
+    else
+    {
+        memset(mem, weight, memSize);
+        //镂空四个圆角
+        
+    }
+    //
+    if(circleMem)
+        delete[] circleMem;
+    return mem;
+}
+
 

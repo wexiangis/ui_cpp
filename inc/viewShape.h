@@ -22,7 +22,9 @@ public:
     unsigned char* get_polygon(int w, int h, int lineSize, unsigned char weight);
     //复杂多边形的填充
     unsigned char* get_polygon2(int w, int h, unsigned char weight);
-    
+    //
+    unsigned char* get_rect(int w, int h, int rad, int lineSize, unsigned char weight);
+
     //----- 基本参数 -----
     int line();
 
