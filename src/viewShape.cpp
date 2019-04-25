@@ -797,20 +797,15 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
     if(lineSize > 0)
     {
         //缩放端点坐标
-        double zoomX = (double)(W-lineSize*2)/WIDTH;
-        double zoomY = (double)(H-lineSize*2)/HEIGHT;
-        for(int i = 0, HW = WIDTH/2, HH = HEIGHT/2; i < DOT_LEN;){
-            if(DOT[i] > HW)
-                dot[i] = W - 1 - (WIDTH-DOT[i]-1)*zoomX - lineSize;//过半部分 缩放
-            else
-                dot[i] = DOT[i]*zoomX + lineSize;//未过半部分 缩放
+        double zoomX = (double)(W-lineSize*2-1)/(WIDTH-1);
+        double zoomY = (double)(H-lineSize*2-1)/(HEIGHT-1);
+        for(int i = 0; i < DOT_LEN;){
+            dot[i] = DOT[i]*zoomX + lineSize;//缩放
             i += 1;
-            if(DOT[i] > HH)
-                dot[i] = H - 1 - (HEIGHT-DOT[i]-1)*zoomY - lineSize;//过半部分 缩放
-            else
-                dot[i] = DOT[i]*zoomY + lineSize;//未过半部分 缩放
+            dot[i] = DOT[i]*zoomY + lineSize;//缩放
             i += 1;
-            // printf("w/%d/%.2lf, h/%d/%.2lf  x/%d, y/%d\n", W, zoomX, H, zoomY, dot[i-2], dot[i-1]);
+            // printf("w/%d/%d/%.2lf, h/%d/%d/%.2lf  x/%d/%d, y/%d/%d\n", 
+            //     WIDTH, W, zoomX, HEIGHT,H, zoomY, DOT[i-2], dot[i-2], DOT[i-1], dot[i-1]);
         }
         //在栅格图上连线
         int xLoad[W+H+1], yLoad[W+H+1], loadCount;
@@ -829,20 +824,15 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
     {
         memset(mem, weight, memSize);
         //缩放端点坐标
-        double zoomX = (double)W/WIDTH;
-        double zoomY = (double)H/HEIGHT;
-        for(int i = 0, HW = WIDTH/2, HH = HEIGHT/2; i < DOT_LEN;){
-            if(DOT[i] > HW)
-                dot[i] = W - 1 - (WIDTH-DOT[i]-1)*zoomX;//过半部分 缩放
-            else
-                dot[i] = DOT[i]*zoomX;//未过半部分 缩放
+        double zoomX = (double)(W-1)/(WIDTH-1);
+        double zoomY = (double)(H-1)/(HEIGHT-1);
+        for(int i = 0; i < DOT_LEN;){
+            dot[i] = DOT[i]*zoomX;//缩放
             i += 1;
-            if(DOT[i] > HH)
-                dot[i] = H - 1 - (HEIGHT-DOT[i]-1)*zoomY;//过半部分 缩放
-            else
-                dot[i] = DOT[i]*zoomY;//未过半部分 缩放
+            dot[i] = DOT[i]*zoomY;//缩放
             i += 1;
-            // printf("w/%d/%.2lf, h/%d/%.2lf  x/%d, y/%d\n", W, zoomX, H, zoomY, dot[i-2], dot[i-1]);
+            // printf("w/%d/%d/%.2lf, h/%d/%d/%.2lf  x/%d/%d, y/%d/%d\n", 
+            //     WIDTH, W, zoomX, HEIGHT,H, zoomY, DOT[i-2], dot[i-2], DOT[i-1], dot[i-1]);
         }
         //在栅格图上连线
         int xLoad[W+H+1], yLoad[W+H+1], loadCount;
@@ -963,20 +953,15 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     //
     dot = new int[DOT_LEN];
     //缩放端点坐标
-    double zoomX = (double)W/WIDTH;
-    double zoomY = (double)H/HEIGHT;
-    for(int i = 0, HW = WIDTH/2, HH = HEIGHT/2; i < DOT_LEN;){
-        if(DOT[i] > HW)
-            dot[i] = W - (WIDTH-DOT[i]-1)*zoomX;//过半部分 缩放
-        else
-            dot[i] = DOT[i]*zoomX + 1;//未过半部分 缩放
+    double zoomX = (double)(W-1)/(WIDTH-1);
+    double zoomY = (double)(H-1)/(HEIGHT-1);
+    for(int i = 0; i < DOT_LEN;){
+        dot[i] = DOT[i]*zoomX + 1;//缩放
         i += 1;
-        if(DOT[i] > HH)
-            dot[i] = H - (HEIGHT-DOT[i]-1)*zoomY;//过半部分 缩放
-        else
-            dot[i] = DOT[i]*zoomY + 1;//未过半部分 缩放
+        dot[i] = DOT[i]*zoomY + 1;//缩放
         i += 1;
-        // printf("w/%d/%.2lf, h/%d/%.2lf  x/%d, y/%d\n", W, zoomX, H, zoomY, dot[i-2], dot[i-1]);
+        // printf("w/%d/%d/%.2lf, h/%d/%d/%.2lf  x/%d/%d, y/%d/%d\n", 
+        //     WIDTH, W, zoomX, HEIGHT,H, zoomY, DOT[i-2], dot[i-2], DOT[i-1], dot[i-1]);
     }
     //在栅格图上连线
     int xLoad[W+H+1], yLoad[W+H+1], loadCount;
