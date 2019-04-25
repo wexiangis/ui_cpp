@@ -31,8 +31,12 @@ int main(int argc, char **argv)
     int w = VIEW_X_SIZE, h = VIEW_Y_SIZE;
     // int w = 100, h = 100;
 
-    // Polygon pg( 9 );
-    // Polygon pg( 20 , new int[20*2] {-2,3, 2,3, 1,5, 5,5, 5,1, 3,2, 3,-2, 5,-1, 5,-5, 1,-5, 2,-3, -2,-3, -1,-5, -5,-5, -5,-1, -3,-2, -3,2, -5,1, -5,5, -1,5} );
+    // Polygon pg( 5 );
+
+    // Polygon pg( 20 , new int[20*2] {
+    //     -2,3, 2,3, 1,5, 5,5, 5,1, 3,2, 3,-2, 5,-1, 5,-5, 1,-5, 
+    //     2,-3, -2,-3, -1,-5, -5,-5, -5,-1, -3,-2, -3,2, -5,1, -5,5, -1,5} );
+
     Polygon pg( 49 , new int[49*2] {
         0,-1, 1,0, 2,-1, 3,0, 4,-1, 5,0, 6,-1, 7,0, 7,1, 6,0, 
         5,1, 4,0, 3,1, 2,0, 1,1, 0,0, 0,1, 1,2, 2,1, 3,2, 
@@ -45,9 +49,9 @@ int main(int argc, char **argv)
     clock_count(0);
 
     clock_count(1);
-    // unsigned char *grid = pg.get_polygon(w, h, 1, 0xFF);//画线
+    unsigned char *grid = pg.get_polygon(w, h, 10, 0xFF);//画线
     // unsigned char *grid = pg.get_polygon(w, h, 0, 0xFF);//普通图形填充
-    unsigned char *grid = pg.get_polygon2(w, h, 0xFF);//复杂凹多边形填充
+    // unsigned char *grid = pg.get_polygon2(w, h, 0xFF);//复杂凹多边形填充
     clock_count(2);
 
     pen.clear(0);

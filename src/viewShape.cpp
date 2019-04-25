@@ -20,7 +20,7 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
     int circle_size = lineSize;
     //栅格图相关
     int xSize = RAD*2+1, ySize = xSize;
-    int xMid = RAD+1, yMid = xMid;
+    int xMid = RAD, yMid = xMid;
     unsigned char *mem;
     unsigned char **memBUff;
     //栅格图指针准备
@@ -296,9 +296,9 @@ unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char w
     int circle_size = rad2 > RAD ? 0 : (RAD - rad2);
     //栅格图相关
     int xSize = RAD*2+1, ySize = xSize;
-    int xMid = RAD+1, yMid = xMid;
-    unsigned char *mem;
-    unsigned char **memBUff;
+    int xMid = RAD, yMid = xMid;
+    unsigned char *mem = NULL;
+    unsigned char **memBUff = NULL;
     //栅格图指针准备
     if(grid)
     {
@@ -810,13 +810,75 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
         //在栅格图上连线
         int xLoad[W+H+1], yLoad[W+H+1], loadCount;
         dotP = &dot[DOT_LEN-2];
-        for(int i = 0; i < DOT_LEN; i+=2){
-            //获取直线坐标
-            loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
-            dotP = &dot[i];
-            //画点
-            for(int j = 0; j < loadCount; j++)
-                memBUff[yLoad[j]][xLoad[j]] = weight;
+        //
+        if(lineSize == 1)
+        {
+            for(int i = 0; i < DOT_LEN; i+=2){
+                //获取直线坐标
+                loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
+                dotP = &dot[i];
+                //画点
+                for(int j = 0; j < loadCount; j++)
+                    memBUff[yLoad[j]][xLoad[j]] = weight;
+            }
+        }
+        else
+        {
+            int cW, cH;
+            unsigned char *circleMem = _circle(lineSize, 0, 0, 0, weight, NULL, &cW, &cH, NULL);
+            int lastDot[2] = {-999, -999};
+            //
+            for(int i = 0; i < DOT_LEN; i+=2){
+                //获取直线坐标
+                loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
+                dotP = &dot[i];
+                //画点
+                int ccWS, ccWL, ccHS, ccHL, cmXErr, cmYErr;
+                unsigned char *pc, *pm, hit;
+                for(int j = 0; j < loadCount; j++)
+                {
+                    //
+                    hit = 1;
+                    if(xLoad[j] == lastDot[0]){
+                        if(yLoad[j] < lastDot[1]){//往上偏
+                            ccWS = 0; ccWL = cW; ccHS = 0; ccHL = lineSize+1;
+                            cmXErr = -lineSize; cmYErr = -lineSize;
+                        }else if(yLoad[j] > lastDot[1]){//往下偏
+                            ccWS = 0; ccWL = cW; ccHS = lineSize+1; ccHL = lineSize;
+                            cmXErr = -lineSize; cmYErr = 0;
+                        }else
+                            hit = 0;
+                    }else if(yLoad[j] == lastDot[1]){
+                        if(xLoad[j] < lastDot[0]){///往左偏
+                            ccWS = 0; ccWL = lineSize+1; ccHS = 0; ccHL = cH;
+                            cmXErr = -lineSize; cmYErr = -lineSize;
+                        }else if(xLoad[j] > lastDot[0]){//往右篇
+                            ccWS = lineSize+1; ccWL = lineSize; ccHS = 0; ccHL = cH;
+                            cmXErr = 0; cmYErr = -lineSize;
+                        }else
+                            hit = 0;
+                    }else{
+                        ccWS = 0; ccWL = cW; ccHS = 0; ccHL = cH;
+                        cmXErr = -lineSize; cmYErr = -lineSize;
+                    }
+                    //
+                    if(hit){
+                        pc = &circleMem[ccHS*cW + ccWS];
+                        pm = &mem[(yLoad[j]+cmYErr)*W + (xLoad[j]+cmXErr)];
+                        for(int k = 0; k < ccHL; k++){
+                            for(int l = 0; l < ccWL; l++)
+                                pm[l] |= pc[l];
+                            //
+                            pc += cW;
+                            pm += W;
+                        }
+                    }
+                    //
+                    lastDot[0] = xLoad[j];
+                    lastDot[1] = yLoad[j];
+                }
+            }
+            delete[] circleMem;
         }
     }
     //----- 填充 -----
