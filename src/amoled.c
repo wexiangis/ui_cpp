@@ -58,8 +58,8 @@ static void _amoled_draw(Amoled_Struct *as)
     snprintf(bmpFile, 64, "%s.jpg", outputBmp);
     enjpeg(bmpFile, as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
 #endif
-    // bmp_create("test.bmp", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
-    enjpeg("test.jpg", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
+    bmp_create("test.bmp", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
+    // enjpeg("test.jpg", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
 #else
 #if(AMOLED_USE_FRAMEBUFFER)
     memcpy(as->base.hware.fb, as->data.data, as->base.size);

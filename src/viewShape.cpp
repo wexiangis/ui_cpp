@@ -952,48 +952,55 @@ void _recursion_part(unsigned char **memBUff, int w, int h, int divH, unsigned c
     int temp;
     //
     recursion(memBUff, 0, 0, w, divH-1, weight);
-    while(check)
-    {
-        //由上至下
-        for(cY = divH, check = 0; cY < h; cY+= divH)
-        {
-            mp = memBUff+cY;
-            //
-            if(cY + divH < h)
-                temp = divH - 1;
-            else
-                temp = h - cY - 1;
-            //
-            for(cX = 0; cX < w; cX++)
-            {
-                if(memBUff[cY][cX] == weight && memBUff[cY-1][cX] == 0)
-                    recursion(mp, cX, 0, w-1, temp, weight);
-                else if(memBUff[cY][cX] == 0 && memBUff[cY-1][cX] == weight)
-                    check += 1;
-            }
-        }
-        //由下至上
+    //
+    do{
         if(check)
         {
-            for(cY = cY - divH, check = 0; cY > 0; cY-=divH)
+            //由上至下
+            for(cY = divH, check = 0; cY < h; cY+= divH)
             {
-                if(cY == divH)
-                    temp = 0;
-                else
-                    temp = divH;
+                mp = memBUff+cY;
                 //
-                mp = memBUff+cY-temp;
+                if(cY + divH < h)
+                    temp = divH - 1;
+                else
+                    temp = h - cY - 1;
                 //
                 for(cX = 0; cX < w; cX++)
                 {
-                    if(memBUff[cY][cX] == 0 && memBUff[cY-1][cX] == weight)
-                        recursion(mp, cX, temp-1, w-1, divH, weight);
-                    else if(memBUff[cY][cX] == weight && memBUff[cY-1][cX] == 0)
+                    if(memBUff[cY][cX] == weight && memBUff[cY-1][cX] == 0){
+                        recursion(mp, cX, 0, w-1, temp, weight);
                         check += 1;
+                    }
                 }
             }
         }
-    }
+        
+        if(check)
+        {
+            //由下至上
+            for(cY = cY - divH, check = 0; cY > 0; cY-=divH)
+            {
+                if(cY == divH)
+                    mp = memBUff;
+                else
+                    mp = memBUff+cY-divH;
+                //
+                temp = divH-1;
+                //
+                for(cX = 0; cX < w; cX++)
+                {
+                    if(memBUff[cY][cX] == 0 && memBUff[cY-1][cX] == weight){
+                        recursion(mp, cX, temp, w-1, temp, weight);
+                        check += 1;
+                    }
+                }
+            }
+        }
+
+        printf("recursion check: %d\n", check);
+
+    }while(check);
 }
 
 unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
