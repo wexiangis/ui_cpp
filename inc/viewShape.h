@@ -12,6 +12,9 @@ public:
     Polygon(int line, int *xy);//xy[] = {x1, y1, x2, y2, ...};
     ~Polygon();
 
+    void set(int line);
+    void set(int line, int *xy);
+
     //----- 获取多边形数据 -----
     //获取圆形: rad > 0, 其它 = 0
     //获取圆环: rad, rad2 > 0 且 rad > rad2, 其它 = 0

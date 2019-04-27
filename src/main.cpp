@@ -61,9 +61,13 @@ int main(int argc, char **argv)
     clock_count(0);
 
     clock_count(1);
+
     // unsigned char *grid = pg.get_polygon(w, h, 10, 0xFF);//画线
     // unsigned char *grid = pg.get_polygon(w, h, 0, 0xFF);//普通图形填充
-    unsigned char *grid = pg.get_polygon2(w, h, 0xFF);//复杂凹多边形填充
+    // unsigned char *grid = pg.get_polygon2(w, h, 0xFF);//复杂凹多边形填充
+
+    unsigned char *grid = pg.get_rect(w, h, 100, 50, 0xFF);
+
     clock_count(2);
 
     pen.clear(0);

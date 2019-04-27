@@ -611,13 +611,16 @@ void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned 
 
 //-------------------- 接口封装 --------------------
 
-Polygon::Polygon(int line = 0)
+void Polygon::set(int line = 0)
 {
+    if(DOT)
+        delete[] DOT;
+    //
     if(line < 3)//圆
     {
         LINE = 0;
         DOT_LEN = 0;
-        DOT = 0;
+        DOT = NULL;
         WIDTH = 1;
         HEIGHT = 1;
         return;
@@ -687,13 +690,16 @@ Polygon::Polygon(int line = 0)
     //     LINE, WIDTH, HEIGHT, DOT_LEN, minX, maxX, minY, maxY);
 }
 
-Polygon::Polygon(int line, int *xy)
+void Polygon::set(int line, int *xy)
 {
+    if(DOT)
+        delete[] DOT;
+    //
     if(line < 3 || !xy)//圆
     {
         LINE = 0;
         DOT_LEN = 0;
-        DOT = 0;
+        DOT = NULL;
         WIDTH = 1;
         HEIGHT = 1;
         return;
@@ -754,6 +760,16 @@ Polygon::Polygon(int line, int *xy)
     //
     // printf("init: line/%d, width/%d, height/%d, dot_len/%d [%d-%d %d-%d]\n", 
     //     LINE, WIDTH, HEIGHT, DOT_LEN, minX, maxX, minY, maxY);
+}
+
+Polygon::Polygon(int line = 0):DOT(NULL)
+{
+    Polygon::set(line);
+}
+
+Polygon::Polygon(int line, int *xy):DOT(NULL)
+{
+    Polygon::set(line, xy);
 }
 
 Polygon::~Polygon()
@@ -1088,29 +1104,76 @@ unsigned char* Polygon::get_polygon2_origin(int &w, int &h, unsigned char weight
 unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned char weight)
 {
     int W = w, H = h;
+    int LSize = lineSize<1?0:lineSize;
     int memSize = W*H;
     int RAD = rad>0?rad:0;
-    unsigned char *mem = NULL, *pm;
+    int circle_size = RAD*2+1;
+    unsigned char *mem = NULL;
     unsigned char *circleMem = NULL;
     //
     if(w < 0 || h < 0)
         return NULL;
+    if(LSize > H)
+        LSize = H;
+    if(LSize > W)
+        LSize = W;
     //
     mem = new unsigned char[memSize];
     if(RAD > 0)
-        circleMem = _circle(RAD, RAD-lineSize, 0, 0, weight, NULL, NULL, NULL, NULL);
+    {
+        if(LSize > 0)
+            circleMem = _circle(RAD, RAD-LSize, 0, 0, weight, NULL, NULL, NULL, NULL);
+        else
+            circleMem = _circle(RAD, 0, 0, 0, weight, NULL, NULL, NULL, NULL);
+    }
     //
     int rxL = RAD, ryL = RAD;
+    if(W < RAD*2)
+        rxL = W/2+1;
+    if(H < RAD*2)
+        ryL = H/2+1;
     //
-    if(lineSize > 0)
-    {
-        ;
-    }
-    else
-    {
+    if(LSize == 0)
         memset(mem, weight, memSize);
-        //镂空四个圆角
-        
+    //
+    unsigned char *pm = mem;
+    unsigned char *pcU = circleMem, *pcU2 = pcU+circle_size-rxL;
+    unsigned char *pcD = circleMem+(circle_size-ryL)*circle_size, *pcD2 = pcD+circle_size-rxL;
+    //
+    for(int i = 0; i < H; i++)
+    {
+        if(i < ryL)
+        {
+            memcpy(pm, pcU, rxL);
+            memcpy(&pm[w-rxL], pcU2, rxL);
+            pcU += circle_size;
+            pcU2 += circle_size;
+        }
+        else if(i >= H - ryL)
+        {
+            memcpy(pm, pcD, rxL);
+            memcpy(&pm[w-rxL], pcD2, rxL);
+            pcD += circle_size;
+            pcD2 += circle_size;
+        }
+        //
+        if(i < LSize || i >= H - LSize)
+        {
+            memset(&pm[rxL], weight, W - rxL*2);
+            // for(int j = rxL; j < W - rxL; j++)
+            //     pm[j] = weight;
+        }
+        //
+        if(i >= ryL && i < H - ryL)
+        {
+            int j;
+            for(j = 0; j < LSize; j++)
+                pm[j] = weight;
+            for(j = W - LSize; j < W; j++)
+                pm[j] = weight;
+        }
+        //
+        pm += W;
     }
     //
     if(circleMem)
