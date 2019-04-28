@@ -796,19 +796,17 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
     int W = w, H = h;
     int memSize = W*H;
     unsigned char *mem = NULL;
-    unsigned char **memBUff = NULL;
-    int *dot = NULL, *dotP;
+    unsigned char *memBUff[H];
+    int dot[DOT_LEN], *dotP;
     //
     if(lineSize > W || lineSize > H)
         return NULL;
     //grid初始化
     mem = new unsigned char[memSize];
-    memBUff = new unsigned char*[H];
     for(int i = 0, j = 0; i < H; i++){
         memBUff[i] = &mem[j];
         j += W;
     }
-    dot = new int[DOT_LEN];
     //----- 画线 -----
     if(lineSize > 0)
     {
@@ -834,8 +832,8 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
                 loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
                 dotP = &dot[i];
                 //画点
-                for(int j = 0; j < loadCount; j++)
-                    memBUff[yLoad[j]][xLoad[j]] = weight;
+                // for(int j = 0; j < loadCount; j++)
+                //     memBUff[yLoad[j]][xLoad[j]] = weight;
             }
         }
         else
@@ -955,9 +953,6 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
         }
     }
     //
-    delete[] memBUff;
-    delete[] dot;
-    //
     return mem;
 }
 
@@ -1029,19 +1024,18 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     if(DOT_LEN == 0 || w < 1 || h < 1)
         return NULL;
     //
-    int W = w, H = h;
+    int W = w, H = h, W2 = W+2, H2 = H+2;
     int memSize = W*H;
-    unsigned char *mem = NULL;
-    unsigned char **memBUff = NULL;
-    int *dot = NULL, *dotP;
+    unsigned char *mem = NULL, *mem2 = NULL;
+    unsigned char *memBUff[H2];
+    int dot[DOT_LEN], *dotP;
     //grid初始化
-    memBUff = new unsigned char*[H+2];
-    for(int i = 0; i < H+2; i++){
-        memBUff[i] = new unsigned char[W+2];
-        memset(memBUff[i], weight, W+2);
+    mem2 = new unsigned char[(W2)*(H2)];
+    memset(mem2, weight, W2*H2);
+    for(int i = 0, j = 0; i < H2; i++){
+        memBUff[i] = &mem2[j];
+        j += W2;
     }
-    //
-    dot = new int[DOT_LEN];
     //缩放端点坐标
     double zoomX = (double)(W-1)/(WIDTH-1);
     double zoomY = (double)(H-1)/(HEIGHT-1);
@@ -1054,7 +1048,7 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
         //     WIDTH, W, zoomX, HEIGHT,H, zoomY, DOT[i-2], dot[i-2], DOT[i-1], dot[i-1]);
     }
     //在栅格图上连线
-    int xLoad[W+H+1], yLoad[W+H+1], loadCount;
+    int xLoad[W2+H2+1], yLoad[W2+H2+1], loadCount;
     dotP = &dot[DOT_LEN-2];
     for(int i = 0; i < DOT_LEN; i+=2){
         //获取直线坐标
@@ -1069,27 +1063,24 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     //分块递归填充
     if(memSize > recursion_max)
     {
-        if(recursion_max > W+2)
-            _recursion_part(memBUff, W+2, H+2, recursion_max/(W+2), weight);
+        if(recursion_max > W2)
+            _recursion_part(memBUff, W2, H2, recursion_max/W2, weight);
         else
-            _recursion_part(memBUff, W+2, H+2, 1, weight);
+            _recursion_part(memBUff, W2, H2, 1, weight);
     }
     //递归填充
     else
-        recursion(memBUff, 0, 0, W+1, H+1, weight);
+        recursion(memBUff, 0, 0, W2-1, H2-1, weight);
     //
     mem = new unsigned char[W*H];
-    int ccp = 0;
-    delete[] memBUff[ccp++];
-    for(int i = 0; i < memSize;){
-        memcpy(&mem[i], memBUff[ccp], W);
-        delete[] memBUff[ccp++];
-        i += W;
-    }
-    delete[] memBUff[ccp];
     //
-    delete[] memBUff;
-    delete[] dot;
+    for(int i = 0, j = 1; i < memSize;){
+        memcpy(&mem[i], &mem2[j], W);
+        i += W;
+        j += W2;
+    }
+    //
+    delete[] mem2;
     //
     return mem;
 }
