@@ -52,7 +52,7 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
         }
     }
     else
-        mem = new unsigned char[xSize*ySize];
+        mem = new unsigned char[xSize*ySize] {0};
     //
     memBUff = new unsigned char*[ySize];
     for(int i = 0, j = 0; i < ySize; i++){
@@ -281,7 +281,7 @@ unsigned char* _ellipse(int radX, int radY, int lineSize, int angle, int degree,
     if(gw) *gw = xSize;
     if(gh) *gh = ySize;
     //
-    delete[] memBUff;
+    delete []memBUff;
     //
     return mem;
 }
@@ -328,7 +328,7 @@ unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char w
         }
     }
     else
-        mem = new unsigned char[xSize*ySize];
+        mem = new unsigned char[xSize*ySize] {0};
     //
     memBUff = new unsigned char*[ySize];
     for(int i = 0, j = 0; i < ySize; i++){
@@ -485,7 +485,7 @@ unsigned char* _circle(int rad, int rad2, int angle, int degree, unsigned char w
     if(gw) *gw = xSize;
     if(gh) *gh = ySize;
     //
-    delete[] memBUff;
+    delete []memBUff;
     //
     return mem;
 }
@@ -614,7 +614,8 @@ void recursion(unsigned char *map[], int x, int y, int xMax, int yMax, unsigned 
 void Polygon::set(int line = 0)
 {
     if(DOT)
-        delete[] DOT;
+        delete []DOT;
+    DOT = NULL;
     //
     if(line < 3)//圆
     {
@@ -628,7 +629,7 @@ void Polygon::set(int line = 0)
     //
     LINE = line;
     DOT_LEN = LINE*2;
-    DOT = new int[DOT_LEN];
+    DOT = new int[DOT_LEN] {0};
     //多边形
     int radius = 100;
     double degreeCount, degreeStart;//按角度旋转 找到各定点坐标
@@ -693,7 +694,8 @@ void Polygon::set(int line = 0)
 void Polygon::set(int line, int *xy)
 {
     if(DOT)
-        delete[] DOT;
+        delete []DOT;
+    DOT = NULL;
     //
     if(line < 3 || !xy)//圆
     {
@@ -707,7 +709,7 @@ void Polygon::set(int line, int *xy)
     //
     LINE = line;
     DOT_LEN = LINE*2;
-    DOT = new int[DOT_LEN];
+    DOT = new int[DOT_LEN] {0};
     //
     int maxX = xy[0], maxY = xy[1], minX = xy[0], minY = xy[1];
     //
@@ -775,7 +777,8 @@ Polygon::Polygon(int line, int *xy):DOT(NULL)
 Polygon::~Polygon()
 {
     if(DOT)
-        delete[] DOT;
+        delete []DOT;
+    DOT = NULL;
 }
 
 unsigned char* Polygon::get_circle(int rad, int rad2, int angle, int degree, unsigned char weight, unsigned char *grid, int *gw, int *gh, int *xyCentre = NULL)
@@ -802,7 +805,7 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
     if(lineSize > W || lineSize > H)
         return NULL;
     //grid初始化
-    mem = new unsigned char[memSize];
+    mem = new unsigned char[memSize] {0};
     for(int i = 0, j = 0; i < H; i++){
         memBUff[i] = &mem[j];
         j += W;
@@ -832,8 +835,8 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
                 loadCount = _getDotFromLine(dotP[0], dotP[1], dot[i], dot[i+1], xLoad, yLoad);
                 dotP = &dot[i];
                 //画点
-                // for(int j = 0; j < loadCount; j++)
-                //     memBUff[yLoad[j]][xLoad[j]] = weight;
+                for(int j = 0; j < loadCount; j++)
+                    memBUff[yLoad[j]][xLoad[j]] = weight;
             }
         }
         else
@@ -893,7 +896,8 @@ unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char we
                     lastDot[1] = yLoad[j];
                 }
             }
-            delete[] circleMem;
+            if(circleMem)
+                delete []circleMem;
         }
     }
     //----- 填充 -----
@@ -1030,7 +1034,7 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     unsigned char *memBUff[H2];
     int dot[DOT_LEN], *dotP;
     //grid初始化
-    mem2 = new unsigned char[(W2)*(H2)];
+    mem2 = new unsigned char[W2*H2];
     memset(mem2, weight, W2*H2);
     for(int i = 0, j = 0; i < H2; i++){
         memBUff[i] = &mem2[j];
@@ -1072,15 +1076,15 @@ unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
     else
         recursion(memBUff, 0, 0, W2-1, H2-1, weight);
     //
-    mem = new unsigned char[W*H];
+    mem = new unsigned char[W*H] {0};
     //
-    for(int i = 0, j = 1; i < memSize;){
+    for(int i = 0, j = W2 + 1; i < memSize;){
         memcpy(&mem[i], &mem2[j], W);
         i += W;
         j += W2;
     }
     //
-    delete[] mem2;
+    delete []mem2;
     //
     return mem;
 }
@@ -1099,17 +1103,19 @@ unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned c
     int memSize = W*H;
     int RAD = rad>0?rad:0;
     int circle_size = RAD*2+1;
-    unsigned char *mem = NULL;
+    unsigned char *mem = NULL, *pm = NULL;
     unsigned char *circleMem = NULL;
     //
     if(w < 0 || h < 0)
         return NULL;
+    //
     if(LSize > H)
         LSize = H;
     if(LSize > W)
         LSize = W;
     //
-    mem = new unsigned char[memSize];
+    pm = mem = new unsigned char[memSize] {0};
+    //
     if(RAD > 0)
     {
         if(LSize > 0)
@@ -1127,37 +1133,34 @@ unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned c
     if(LSize == 0)
         memset(mem, weight, memSize);
     //
-    unsigned char *pm = mem;
     unsigned char *pcU = circleMem, *pcU2 = pcU+circle_size-rxL;
     unsigned char *pcD = circleMem+(circle_size-ryL)*circle_size, *pcD2 = pcD+circle_size-rxL;
     //
-    for(int i = 0; i < H; i++)
+    for(int i = 0, j = 0; i < H; i++)
     {
         if(i < ryL)
         {
             memcpy(pm, pcU, rxL);
-            memcpy(&pm[w-rxL], pcU2, rxL);
+            memcpy(&pm[W-rxL], pcU2, rxL);
             pcU += circle_size;
             pcU2 += circle_size;
         }
         else if(i >= H - ryL)
         {
             memcpy(pm, pcD, rxL);
-            memcpy(&pm[w-rxL], pcD2, rxL);
+            memcpy(&pm[W-rxL], pcD2, rxL);
             pcD += circle_size;
             pcD2 += circle_size;
         }
         //
         if(i < LSize || i >= H - LSize)
         {
-            memset(&pm[rxL], weight, W - rxL*2);
-            // for(int j = rxL; j < W - rxL; j++)
-            //     pm[j] = weight;
+            for(j = rxL; j < W - rxL; j++)
+                pm[j] = weight;
         }
         //
         if(i >= ryL && i < H - ryL)
         {
-            int j;
             for(j = 0; j < LSize; j++)
                 pm[j] = weight;
             for(j = W - LSize; j < W; j++)
@@ -1168,7 +1171,7 @@ unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned c
     }
     //
     if(circleMem)
-        delete[] circleMem;
+        delete []circleMem;
     return mem;
 }
 

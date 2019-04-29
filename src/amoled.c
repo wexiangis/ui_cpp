@@ -343,7 +343,7 @@ void amoled_refresh(Amoled_Struct *as)
 //
 void amoled_refresh_draw(Amoled_Struct *as)
 {
-    if(memcmp(as->data.data, as->data.backup, as->base.size)) //得不偿失
+    // if(memcmp(as->data.data, as->data.backup, as->base.size)) //得不偿失
     {
         //备份数据  覆盖  现有数据
         memcpy(as->data.data, as->data.backup, as->base.size);

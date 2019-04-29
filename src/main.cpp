@@ -31,11 +31,11 @@ int main(int argc, char **argv)
     int w = VIEW_X_SIZE, h = VIEW_Y_SIZE;
     // int w = 100, h = 100;
 
-    // Polygon pg( 5 );
+    // Polygon pg( 3 );
 
-    // Polygon pg( 20 , new int[20*2] {
-    //     -2,3, 2,3, 1,5, 5,5, 5,1, 3,2, 3,-2, 5,-1, 5,-5, 1,-5, 
-    //     2,-3, -2,-3, -1,-5, -5,-5, -5,-1, -3,-2, -3,2, -5,1, -5,5, -1,5} );
+    Polygon pg( 20 , new int[20*2] {
+        -2,3, 2,3, 1,5, 5,5, 5,1, 3,2, 3,-2, 5,-1, 5,-5, 1,-5, 
+        2,-3, -2,-3, -1,-5, -5,-5, -5,-1, -3,-2, -3,2, -5,1, -5,5, -1,5} );
 
     // Polygon pg( 49 , new int[49*2] {
     //     0,-1, 1,0, 2,-1, 3,0, 4,-1, 5,0, 6,-1, 7,0, 7,1, 6,0, 
@@ -45,39 +45,31 @@ int main(int argc, char **argv)
     //     8,-1, 8,-2, 6,-4, 5,-3, 4,-4, 3,-3, 2,-4, 1,-3, 0,-2
     // });
     
-    Polygon pg( 20 , new int[20*2] {
-        0,0, -1,0, -1,2, 2,2, 2,-2, -3,-2, -3,4, 4,4, 4,-4, -5,-4,
-        -5,4, -4,4, -4,-3, 3,-3, 3,3, -2,3, -2,-1, 1,-1, 1,1, 0,1
-    });
+    // Polygon pg( 20 , new int[20*2] {
+    //     0,0, -1,0, -1,2, 2,2, 2,-2, -3,-2, -3,4, 4,4, 4,-4, -5,-4,
+    //     -5,4, -4,4, -4,-3, 3,-3, 3,3, -2,3, -2,-1, 1,-1, 1,1, 0,1
+    // });
     
     // Polygon pg( 20 , new int[20*2] {
     //     0,0, 1,0, 1,2, -2,2, -2,-2, 3,-2, 3,4, -4,4, -4,-4, 5,-4,
     //     5,4, 4,4, 4,-3, -3,-3, -3,3, 2,3, 2,-1, -1,-1, -1,1, 0,1
     // });
 
+    unsigned char *grid = pg.get_polygon(w-80, h-80, 5, 0xFF);//画线
+    // unsigned char *grid = pg.get_polygon(w-80, h-80, 0, 0xFF);//普通图形填充
+    // unsigned char *grid = pg.get_polygon2(w-80, h-80, 0xFF);//复杂凹多边形填充
+    // unsigned char *grid = pg.get_rect(w-80, h-80, 100, 50, 0xFF);
+
+    unsigned char *grid2 = pg.get_rect(w, h, 50, 10, 0xFF);
 
     ViewPen pen(0);
-
-    clock_count(0);
-
-    clock_count(1);
-
-    // unsigned char *grid = pg.get_polygon(w, h, 1, 0xFF);//画线
-    // unsigned char *grid = pg.get_polygon(w, h, 0, 0xFF);//普通图形填充
-    unsigned char *grid = pg.get_polygon2(w-80, h-80, 0xFF);//复杂凹多边形填充
-    // unsigned char *grid = pg.get_rect(w, h, 100, 50, 0xFF);
-
-    unsigned char *grid2 = pg.get_rect(w, h, 50, 25, 0xFF);
-
-    clock_count(2);
-
     pen.clear(0);
     
     pen.print_grid(grid, 0xFF0000, 40, 40, w-80, h-80, 0);
     pen.print_grid(grid2, 0xFF0000, 0, 0, w, h, 0);
 
     pen.output();
-    usleep(200000);
+    sleep(1);
 
     return 0;
 }
