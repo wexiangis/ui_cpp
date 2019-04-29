@@ -793,10 +793,10 @@ unsigned char* Polygon::get_ellipse(int radX, int radY, int lineSize, int angle,
 
 unsigned char* Polygon::get_polygon(int w, int h, int lineSize, unsigned char weight)
 {
-    if(DOT_LEN == 0 || w < 1 || h < 1)
+    if(DOT_LEN == 0 || !w || !h)
         return NULL;
     //
-    int W = w, H = h;
+    int W = w<0?(-w):w, H = h<0?(-h):h;
     int memSize = W*H;
     unsigned char *mem = NULL;
     unsigned char *memBUff[H];
@@ -1025,10 +1025,11 @@ void _recursion_part(unsigned char **memBUff, int w, int h, int divH, unsigned c
 
 unsigned char* Polygon::get_polygon2(int w, int h, unsigned char weight)
 {
-    if(DOT_LEN == 0 || w < 1 || h < 1)
+    if(DOT_LEN == 0 || !w || !h)
         return NULL;
     //
-    int W = w, H = h, W2 = W+2, H2 = H+2;
+    int W = w<0?(-w):w, H = h<0?(-h):h;
+    int W2 = W+2, H2 = H+2;
     int memSize = W*H;
     unsigned char *mem = NULL, *mem2 = NULL;
     unsigned char *memBUff[H2];
@@ -1098,16 +1099,16 @@ unsigned char* Polygon::get_polygon2_origin(int &w, int &h, unsigned char weight
 
 unsigned char* Polygon::get_rect(int w, int h, int rad, int lineSize, unsigned char weight)
 {
-    int W = w, H = h;
+    if(!w || !h)
+        return NULL;
+    //
+    int W = w<0?(-w):w, H = h<0?(-h):h;
     int LSize = lineSize<1?0:lineSize;
     int memSize = W*H;
     int RAD = rad>0?rad:0;
     int circle_size = RAD*2+1;
     unsigned char *mem = NULL, *pm = NULL;
     unsigned char *circleMem = NULL;
-    //
-    if(w < 0 || h < 0)
-        return NULL;
     //
     if(LSize > H)
         LSize = H;

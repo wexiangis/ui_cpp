@@ -29,6 +29,7 @@ public:
     //获取直线,折线,多边形
     unsigned char* get_polygon(int w, int h, int lineSize, unsigned char weight);
     unsigned char* get_polygon_origin(int &w, int &h, int lineSize, unsigned char weight);
+
     //复杂多边形的填充
     unsigned char* get_polygon2(int w, int h, unsigned char weight);
     unsigned char* get_polygon2_origin(int &w, int &h, unsigned char weight);
@@ -45,6 +46,24 @@ private:
     int DOT_LEN;//DOT长度 例如:{x1,y1,x2,y3} DOT_LEN=4
     int *DOT;//多边形各端点坐标(相对于内接矩形
     int WIDTH, HEIGHT;//外接矩形的宽高
+};
+
+class ViewShape : public Polygon
+{
+public:
+
+    typedef enum{
+        VST_NULL = 0,
+        VST_BUTTON,
+        VST_SWITCH,
+        VST_SCROLL_BAR,
+        VST_PROCESS_BAR,
+        VST_CIRCLE,
+        VST_SECTOR,
+    }ViewShape_Type;
+
+private:
+
 };
 
 #endif

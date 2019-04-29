@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     pen.print_grid(grid2, 0xFF0000, 0, 0, w, h, 0);
 
     pen.output();
-    sleep(1);
+    usleep(10000);
 
     return 0;
 }

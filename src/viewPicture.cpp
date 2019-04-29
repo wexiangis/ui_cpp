@@ -273,21 +273,22 @@ unsigned char* ViewPicture::get_mem(int w, int h,
     int count = 0,
     float weight = 0)
 {
-    if(!READY || w < 1 || h < 1)
+    if(!READY || !w || !h)
         return NULL;
     //
-    int mem_size = w*h*3;
+    int W = w<0?(-w):w, H = h<0?(-h):h;
+    int mem_size = W*H*3;
     unsigned char *mem = (unsigned char *)calloc(mem_size+1, sizeof(unsigned char));
     int xC, yC, pxC, pyC, i; // xC,yC 为 mem 的位置计数; pxC,pyC 为 MAP 的位置计数
     float pxCf, pyCf, xPow, yPow;
     //
-    xPow = (float)WIDTH/w;
-    yPow = (float)HEIGHT/h;//
+    xPow = (float)WIDTH/W;
+    yPow = (float)HEIGHT/H;//
     //
-    for(i = yC = 0, pyCf = 0; yC < h; yC++, pyCf+=yPow)
+    for(i = yC = 0, pyCf = 0; yC < H; yC++, pyCf+=yPow)
     {
         pyC = pyCf;//浮点转int
-        for(xC = 0, pxCf = 0; xC < w; xC++, pxCf+=xPow)
+        for(xC = 0, pxCf = 0; xC < W; xC++, pxCf+=xPow)
         {
             pxC = pxCf;//浮点转int
             mem[i++] = MAP[pyC][pxC][0];
@@ -363,19 +364,20 @@ unsigned char*** ViewPicture::get_map(int w, int h,
     int *alphaColor = NULL,
     int count = 0)
 {
-    if(!READY || w < 1 || h < 1)
+    if(!READY || !w || !h)
         return NULL;
     //
-    unsigned char ***map = _mapInit(MEM, WIDTH, HEIGHT, w, h, WSIZE);
+    int W = w<0?(-w):w, H = h<0?(-h):h;
+    unsigned char ***map = _mapInit(MEM, WIDTH, HEIGHT, W, H, WSIZE);
     //透明色处理
     if(map && count > 0 && alphaColor)
     {
         unsigned char *alphaRGB = _intRGB_to_charRGB(alphaColor, count);
         int xC, yC;
         int i, cc;
-        for(xC = 0; xC < w; xC++)
+        for(xC = 0; xC < W; xC++)
         {
-            for(yC = 0; yC < h; yC++)
+            for(yC = 0; yC < H; yC++)
             {
                 for(i = cc = 0; i < count; i++)
                 {
