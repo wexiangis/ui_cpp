@@ -16,8 +16,8 @@
 #define  VIEW_Y_END     479
 #define  VIEW_PERW      4
 #else
-#define  VIEW_X_SIZE    240
-#define  VIEW_Y_SIZE    240
+#define  VIEW_X_SIZE    500
+#define  VIEW_Y_SIZE    500
 #define  VIEW_X_END     (VIEW_X_SIZE-1)
 #define  VIEW_Y_END     (VIEW_Y_SIZE-1)
 #define  VIEW_PERW      3

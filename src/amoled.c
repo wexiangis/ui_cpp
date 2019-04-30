@@ -58,8 +58,8 @@ static void _amoled_draw(Amoled_Struct *as)
     snprintf(bmpFile, 64, "%s.jpg", outputBmp);
     enjpeg(bmpFile, as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
 #endif
-    bmp_create("test.bmp", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
-    // enjpeg("test.jpg", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
+    // bmp_create("test.bmp", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
+    enjpeg("test.jpg", as->data.data, as->base.xSize, as->base.ySize, as->base.perW);
 #else
 #if(AMOLED_USE_FRAMEBUFFER)
     memcpy(as->base.hware.fb, as->data.data, as->base.size);
@@ -343,7 +343,7 @@ void amoled_refresh(Amoled_Struct *as)
 //
 void amoled_refresh_draw(Amoled_Struct *as)
 {
-    // if(memcmp(as->data.data, as->data.backup, as->base.size)) //得不偿失
+    if(memcmp(as->data.data, as->data.backup, as->base.size)) //得不偿失
     {
         //备份数据  覆盖  现有数据
         memcpy(as->data.data, as->data.backup, as->base.size);
