@@ -50,8 +50,6 @@ add_definitions(-O3 -Wall)
 #app对应源文件
 add_executable(app ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
-#---- 放置 target_link_libraries 要按顺序, 先生成不存在的库(src) ----
-#指定依赖库 src文件夹生成的libsrc.a
-target_link_libraries(app src)
 #指定依赖库 相当于-l
-target_link_libraries(app pthread iconv m jpeg freetype wpa_client)
+#注意库的顺序 必须严格按依赖关系
+target_link_libraries(app src iconv jpeg freetype wpa_client pthread m)
