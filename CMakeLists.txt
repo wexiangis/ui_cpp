@@ -7,8 +7,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 
 #使用交叉编译器?
 
-#set(CROSS_COMPILE "arm-linux-gnueabihf-")
-#set(CROSS "arm_4_9_4")
+# set(CROSS_COMPILE "arm-linux-gnueabihf-")
+# set(CROSS "arm_4_9_4")
 
 set(CROSS_COMPILE "")
 set(CROSS "gcc_4_8_4")
@@ -50,8 +50,8 @@ add_definitions(-O3 -Wall)
 #app对应源文件
 add_executable(app ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
-#指定依赖库 相当于-l
-target_link_libraries(app pthread iconv m jpeg freetype wpa_client src)
-
+#---- 放置 target_link_libraries 要按顺序, 先生成不存在的库(src) ----
 #指定依赖库 src文件夹生成的libsrc.a
 target_link_libraries(app src)
+#指定依赖库 相当于-l
+target_link_libraries(app pthread iconv m jpeg freetype wpa_client)

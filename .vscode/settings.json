@@ -19,6 +19,7 @@
         "new": "cpp",
         "ostream": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "jpeglib.h": "c"
     }
 }

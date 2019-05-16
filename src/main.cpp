@@ -19,7 +19,7 @@ int clock_count(int tag)
     return result;
 }
 
-#define TEST_MODE 4
+#define TEST_MODE 3
 
 #if(TEST_MODE == 4)
 
